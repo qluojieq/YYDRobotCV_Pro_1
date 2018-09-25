@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/dialog_bg"
+    android:layout_width="289dp"
+    android:layout_height="175dp">
+    
+    <RelativeLayout
+        android:layout_centerInParent="true"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+    <TextView
+        android:id="@+id/reference_dialog"
+        android:textSize="15sp"
+        android:textColor="@color/colorTextBlack"
+        android:text="录 入 人 脸 失 败"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+        <LinearLayout
+            android:layout_marginTop="35dp"
+            android:layout_centerHorizontal="true"
+            android:layout_below="@id/reference_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:id="@+id/cancel_confirm"
+                android:background="@mipmap/btn_qx1"
+                android:gravity="center"
+                android:text="我知道了"
+                android:textSize="14sp"
+                android:textColor="@color/colorTextWrite"
+                android:layout_width="87dp"
+                android:layout_height="29dp" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</RelativeLayout>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="add_face_hint_text">16dp</dimen>
+    <dimen name="btn_main_height">20dp</dimen>
+    <dimen name="btn_main_width">21dp</dimen>
+    <dimen name="btn_next_height">35dp</dimen>
+    <dimen name="btn_next_width">73dp</dimen>
+    <dimen name="btn_main_margin_top">21dp</dimen>
+    <dimen name="btn_main_margin_side">32dp</dimen>
+    <dimen name="text_size_base_info">14sp</dimen>
+    <dimen name="text_size_base_info_choice">16sp</dimen>
+    <dimen name="text_size_item">16sp</dimen>
+    <dimen name="line_size_base_info">45dp</dimen>
+    <dimen name="btn_next_text_size">16sp</dimen>
+    <dimen name="btn_info_delete_height">35dp</dimen>
+    <dimen name="btn_info_delete_width">35dp</dimen>
+    <dimen name="test_btn_height">45dp</dimen>
+</resources>

@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent">
+
+                <TextView
+                    android:id="@+id/btn_info_next"
+                    android:layout_width="@dimen/btn_next_width"
+
+                    android:layout_height="@dimen/btn_next_height"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginTop="@dimen/btn_main_margin_top"
+                    android:layout_marginRight="@dimen/btn_main_margin_side"
+                    android:background="@drawable/btn_next_bg"
+                    android:gravity="center"
+                    android:text="下一步"
+                    android:textColor="@color/colorTextWrite"
+                    android:textSize="@dimen/btn_next_text_size" />
+                <RelativeLayout
+                    android:layout_width="243dp"
+                    android:layout_height="47dp"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="25dp">
+
+                    <ImageView
+                        android:id="@+id/info_step_hint"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@mipmap/info_step_1" />
+
+                    <LinearLayout
+                        android:id="@+id/btn_hint_clickable"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:orientation="horizontal">
+
+                        <TextView
+                            android:id="@+id/hint_info1"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/hint_info2"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/hint_info3"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+
+                        <TextView
+                            android:id="@+id/hint_info4"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent"
+                            android:layout_weight="1" />
+                    </LinearLayout>
+                </RelativeLayout>
+
+            </RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+
+
+
+        <LinearLayout
+            android:layout_marginLeft="200dp"
+            android:layout_centerVertical="true"
+            android:id="@+id/insert_phone_tap"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:paddingRight="15dp"
+                    android:text="手机号"
+                    android:textColor="@color/colorTextWrite"
+                    android:textSize="@dimen/text_size_base_info_choice" />
+
+                <EditText
+                    android:paddingLeft="5dp"
+                    android:id="@+id/edit_phone"
+                    android:layout_width="150dp"
+                    android:layout_height="30dp"
+                    android:background="@mipmap/ic_edit_bg"
+                    android:gravity="center|left"
+                    android:hint="请输入手机号码"
+                    android:imeOptions="flagNoExtractUi"
+                    android:inputType="phone"
+                    android:maxLength="11"
+                    android:singleLine="true"
+                    android:textColor="@color/colorTextWrite"
+                    android:textColorHint="@color/colorEditHint"
+                    android:textSize="@dimen/text_size_base_info" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/input_warn_phone"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginLeft="70dp"
+                android:layout_marginTop="5dp"
+                android:text="请 输 入 正 确 的 手 机 号 码"
+                android:textColor="@color/colorWarn"
+                android:textSize="11sp"
+                android:visibility="visible" />
+        </LinearLayout>
+
+    <LinearLayout
+        android:visibility="gone"
+        android:layout_centerVertical="true"
+        android:id="@+id/insert_name_tap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:layout_marginLeft="100dp"
+
+        >
+
+        <LinearLayout
+            android:layout_marginLeft="100dp"
+            android:id="@+id/input_name_panel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:paddingRight="15dp"
+                android:text="姓名"
+                android:textColor="@color/colorTextWrite"
+                android:textSize="@dimen/text_size_base_info_choice" />
+
+            <EditText
+                android:paddingLeft="5dp"
+                android:id="@+id/edit_name"
+                android:layout_width="150dp"
+                android:layout_height="30dp"
+                android:background="@mipmap/ic_edit_bg"
+                android:gravity="center|left"
+                android:hint="请输入您的姓名"
+                android:imeOptions="flagNoExtractUi"
+                android:inputType="text"
+                android:maxLength="12"
+                android:singleLine="true"
+                android:textSize="@dimen/text_size_base_info"
+                android:textColor="@color/colorTextWrite"
+                android:textColorHint="@color/colorEditHint" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/input_warn_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/input_name_panel"
+            android:layout_marginLeft="150dp"
+            android:layout_marginTop="5dp"
+            android:text="中文不超过6个字符，英文不超过12个字符，不支持中英混合输入"
+            android:textColor="@color/colorWarn"
+            android:textSize="11sp" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/insert_birthday_tap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone">
+
+    </FrameLayout>
+
+
+    <LinearLayout
+        android:id="@+id/insert_gender_tap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:orientation="horizontal"
+        android:visibility="gone">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_marginRight="20dp"
+            android:gravity="center"
+            android:text="性别"
+            android:textColor="@color/colorTextWrite"
+            android:textSize="@dimen/text_size_base_info_choice" />
+
+        <com.bigkoo.pickerview.lib.WheelView
+            android:id="@+id/gender_choice"
+            android:layout_width="70dp"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+
+
+</RelativeLayout>
+

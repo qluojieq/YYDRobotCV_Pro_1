@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="128dp"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+    <RelativeLayout
+        android:id="@+id/reference_1"
+        android:layout_centerHorizontal="true"
+        android:layout_width="98dp"
+        android:background="@mipmap/ic_portrait"
+        android:layout_height="98dp">
+        <ImageView
+            android:id="@+id/item_portrait"
+            android:layout_centerInParent="true"
+            android:src="@mipmap/ic_success"
+            android:layout_width="81dp"
+            android:layout_height="81dp" />
+    </RelativeLayout>
+
+    <TextView
+        android:textSize="@dimen/text_size_item"
+        android:textColor="@color/colorText"
+        android:layout_marginTop="10dp"
+        android:layout_below="@id/reference_1"
+        android:id="@+id/item_name"
+        android:text="Brandon"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@mipmap/big_background"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MianListActivity">
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="60dp">
+    <TextView
+        android:id="@+id/infer_back"
+        android:onClick="mainBack"
+        android:background="@mipmap/ic_feedback"
+        android:layout_marginTop="@dimen/btn_main_margin_top"
+        android:layout_marginLeft="@dimen/btn_main_margin_side"
+        android:layout_width="@dimen/btn_main_width"
+        android:layout_height="@dimen/btn_main_height" />
+    <com.yongyida.yydrobotcv.customview.HorizontalSideBar
+
+        android:layout_toRightOf="@id/infer_back"
+        android:layout_centerInParent="true"
+        app:selectTextColor="@color/colorTextWrite"
+        android:id="@+id/side_bar"
+        app:textColor="@color/colorText"
+        app:textSize="17sp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" />
+
+</RelativeLayout>
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/user_recycle"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+        </android.support.v7.widget.RecyclerView>
+
+
+   </FrameLayout>
+
+</LinearLayout>

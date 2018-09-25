@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:orientation="horizontal"
+    android:layout_height="wrap_content">
+    <TextView
+        android:layout_marginRight="10dp"
+        android:textSize="@dimen/text_size_base_info_choice"
+        android:textColor="@color/colorTextWrite"
+        android:text="生日"
+        android:gravity="center"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent" />
+    <com.bigkoo.pickerview.lib.WheelView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/choice_year"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content" />
+    <com.bigkoo.pickerview.lib.WheelView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/choice_month"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content" />
+    <com.bigkoo.pickerview.lib.WheelView
+        android:layout_marginLeft="10dp"
+        android:id="@+id/choice_day"
+        android:layout_width="70dp"
+        android:layout_height="wrap_content" />
+
+
+</LinearLayout>

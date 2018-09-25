@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="289dp"
+    android:layout_height="175dp"
+    android:background="@drawable/dialog_bg">
+
+    <TextView
+        android:id="@+id/reference_toast"
+        android:textStyle="bold"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="提示:"
+        android:textColor="@color/colorTextBlack"
+        android:textSize="15sp" />
+
+
+
+        <TextView
+
+            android:layout_marginLeft="20dp"
+            android:layout_below="@id/reference_toast"
+            android:layout_marginTop="10dp"
+            android:id="@+id/edit_who_checked_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="已经识别您为王洋洋，139***6789"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="15sp" />
+
+        <TextView
+            android:layout_marginTop="15dp"
+            android:layout_below="@id/edit_who_checked_dialog"
+            android:id="@+id/reference_dialog"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="是 否 更 新 你 的 人脸 库 ?"
+            android:textColor="@color/colorTextBlack"
+            android:textSize="15sp" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="25dp">
+
+        <TextView
+            android:id="@+id/cancel_close"
+            android:layout_width="87dp"
+            android:layout_height="29dp"
+            android:background="@mipmap/btn_qx"
+
+            android:gravity="center"
+            android:text="我不是他"
+            android:textColor="@color/colorTextWrite"
+            android:textSize="14sp" />
+
+        <TextView
+            android:id="@+id/cancel_confirm"
+            android:layout_width="87dp"
+            android:layout_height="29dp"
+            android:layout_marginLeft="38dp"
+            android:background="@mipmap/btn_qx1"
+            android:gravity="center"
+            android:text="更新"
+            android:textColor="@color/colorTextWrite"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+</RelativeLayout>

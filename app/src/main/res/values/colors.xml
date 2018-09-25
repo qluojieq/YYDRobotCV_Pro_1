@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+    <color name="colorWarn">#FF3AFFC5</color>
+    <color name="colorText">#ffffffff</color>
+    <color name="colorTextBlack">#000000</color>
+    <color name="colorTextTest">#ffffffff</color>
+    <color name="colorTextWrite">#ffffffff</color>
+    <color name="colorToast">#19000000</color>
+    <color name="colorCameraFrame">#99000000</color>
+    <color name="colorEditHint">#FFB0B4FE</color>
+    <color name="dialogBackColor">#ffffffff</color>
+    <color name="nextBtnBackColor">#19000000</color>
+
+</resources>

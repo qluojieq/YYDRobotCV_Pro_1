@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@mipmap/big_background"
+    tools:context=".RegisterActivity">
+    <Button
+        android:layout_marginTop="@dimen/btn_main_margin_top"
+        android:layout_marginLeft="@dimen/btn_main_margin_side"
+        android:onClick="registerBack"
+        android:background="@mipmap/ic_feedback"
+        android:gravity="center"
+        android:layout_width="@dimen/btn_main_width"
+        android:layout_height="@dimen/btn_main_height" />
+
+    <FrameLayout
+        android:id="@+id/register_frame"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+    </FrameLayout>
+
+</RelativeLayout>
