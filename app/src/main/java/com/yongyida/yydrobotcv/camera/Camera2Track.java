@@ -5,6 +5,8 @@ import android.media.Image;
 import android.media.ImageReader;
 import android.util.Log;
 
+import java.util.Date;
+
 
 /**
  * Created by Brandon on 2017/11/8.
@@ -47,7 +49,9 @@ public class Camera2Track extends CameraBase {
             if (image == null) {
                 return;
             }
+
             mPreviewListener.preview(ImageUtils.getDataFromImage(image, ImageUtils.COLOR_FormatNV21));
+
             image.close();
         } catch (final Exception e) {
             if (image != null) {

@@ -15,9 +15,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.ByteBuffer;
-
-import static android.content.ContentValues.TAG;
-
+import java.util.Date;
 /**
  * Created by Brandon on 2017/10/18.
  */
@@ -25,6 +23,7 @@ import static android.content.ContentValues.TAG;
 public class ImageUtils {
 
 
+    private final static String TAG = ImageUtils.class.getSimpleName();
     static Bitmap bmp = null;
     static YuvImage image = null;
     static ByteArrayOutputStream stream;
@@ -52,6 +51,7 @@ public class ImageUtils {
     static byte[] rowData;
 
     public static byte[] getDataFromImage(Image image, int colorFormat) {
+        Long startTime = new Date().getTime();
         if (colorFormat != COLOR_FormatI420 && colorFormat != COLOR_FormatNV21) {
             throw new IllegalArgumentException("only support COLOR_FormatI420 " + "and COLOR_FormatNV21");
         }
@@ -120,6 +120,8 @@ public class ImageUtils {
             }
         }
         rowData = null;
+        Long endTime = new Date().getTime();
+        Log.e(TAG,"time cost with yuv convert " + (endTime - startTime));
         return data;
     }
 

@@ -6,7 +6,6 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.yongyida.robot.communicate.app.common.response.BaseResponseControl;
 import com.yongyida.robot.communicate.app.common.send.SendClient;
 import com.yongyida.robot.communicate.app.common.send.SendResponseListener;
 import com.yongyida.robot.communicate.app.hardware.motion.response.data.Ultrasonic;
@@ -20,22 +19,27 @@ import com.yongyida.yydrobotcv.tts.TTSManager;
  **/
 public class PirPersonDetectService extends Service {
 
-    public static final int STOP_DISTANCE = 50;
-    private static final int LOW_DISTANCE = 80;
-    private static final int FAR_DISTANCE = 200;
+
     private final static String TAG = PirPersonDetectService.class.getSimpleName();
+
+    public static final int STOP_DISTANCE = 50;
+    public static final int LOW_DISTANCE = 150;
+    public static final int FAR_DISTANCE = 200;
+
     private QueryPirValueControl mQueryPirValueControl = new QueryPirValueControl();
     private QueryUltrasonicControl mQueryUltraValueControl = new QueryUltrasonicControl();
+    static int  ultraDistance = 70;
 
-    int ultraDistance = 70;
+    boolean isPersonOn = false;
+    boolean isPirOn = false;
     private SendResponseListener mSendPirResponseListener = new SendResponseListener<PirValue>() {
-
         @Override
-        public void onSuccess(PirValue pirValue) {
+        public void onSuccess(PirValue pirValue) {   // Pir 只检测来人，没人由人脸检测返回
             Log.e(TAG, "pir success " + pirValue.isHasPeople());
-            if (pirValue != null) {
+            if (pirValue != null && !isPersonOn) {
+                isPersonOn = true;
                 if (ultraDistance < FAR_DISTANCE) {
-                    if (ultraDistance < LOW_DISTANCE) {
+                    if (isInDistance()) {
                         TTSManager.TTS("你好"+" 让我好好看看", null);
                         Intent intent = new Intent(PirPersonDetectService.this,FaceDetectService.class);
                         intent.putExtra("startType", "active_interaction");
@@ -51,8 +55,6 @@ public class PirPersonDetectService extends Service {
                         // 启动追踪
                     }
 
-                } else {
-//                    TTSManager.TTS("人已经离开", null);
                 }
             }
 
@@ -68,6 +70,7 @@ public class PirPersonDetectService extends Service {
         public void onSuccess(Ultrasonic ultrasonic) {
             if (ultrasonic != null) {
                 ultraDistance = ultrasonic.getDistances()[5];
+                Log.e(TAG,"当前检测到的PIR 中检测中的距离 " + ultraDistance);
             }
         }
 
@@ -92,11 +95,21 @@ public class PirPersonDetectService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        SendClient.getInstance(this).send(this, mQueryPirValueControl, mSendPirResponseListener);
-        mQueryUltraValueControl.setAndroid(QueryUltrasonicControl.Android.SEND);
-        SendClient.getInstance(this).send(this, mQueryUltraValueControl, mSendUltraResponseListener);
-        Log.e(TAG, " pir人体检测开启成功 ");
-        TTSManager.TTS("红外人体检测开启成功！",null);
+        if (!isPirOn){ //pir 是否开启
+
+            SendClient.getInstance(this).send(this, mQueryPirValueControl, mSendPirResponseListener);
+            mQueryUltraValueControl.setAndroid(QueryUltrasonicControl.Android.SEND);
+            SendClient.getInstance(this).send(this, mQueryUltraValueControl, mSendUltraResponseListener);
+            Log.e(TAG, " pir人体检测开启成功 ");
+            TTSManager.TTS("红外人体检测开启成功！",null);
+            isPirOn = true;
+        }
+        if (isPersonOn){  // isPersonOn 监控是否有人
+           String startType =  intent.getStringExtra("startType");
+           if (startType.equals("noFace")){
+               isPersonOn = false;
+           }
+        }
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -121,5 +134,16 @@ public class PirPersonDetectService extends Service {
         super.onDestroy();
     }
 
-
+    public static boolean isInDistance(int distance){
+        boolean ret = false;
+        if (distance>STOP_DISTANCE&&distance<LOW_DISTANCE)
+            ret = true;
+        return ret;
+    }
+    public static boolean isInDistance(){
+        boolean ret = false;
+        if (ultraDistance>STOP_DISTANCE&&ultraDistance<LOW_DISTANCE)
+            ret = true;
+        return ret;
+    }
 }

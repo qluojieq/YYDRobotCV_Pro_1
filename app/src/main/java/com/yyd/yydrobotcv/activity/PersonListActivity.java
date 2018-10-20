@@ -56,8 +56,13 @@ public class PersonListActivity extends AppCompatActivity {
 
     public void startPersonDetect(View view) {
         Log.e(TAG,"开始人体检测");
-        Intent intent = new Intent(this, PirPersonDetectService.class);
-        intent.putExtra("startType","start");
+//        Intent intent = new Intent(this, PirPersonDetectService.class);
+//        intent.putExtra("startType","start");
+//        startService(intent);
+        Intent intent = new Intent();
+//        intent.setAction("com.yongyda.yydrobotcv.pirfaceservice");
+        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv","com.yongyida.yydrobotcv.service.PirPersonDetectService");
+        intent.setComponent(componentName);
         startService(intent);
     }
     public void closePersonDetect(View view) {
@@ -65,12 +70,17 @@ public class PersonListActivity extends AppCompatActivity {
 //        Intent intent = new Intent(this, PersonDetectService.class);
 //        intent.putExtra("startType","stop");
 //        startService(intent);
-        Intent intent = new Intent(this,PirPersonDetectService.class);
+        Intent intent = new Intent();
+        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv","com.yongyida.yydrobotcv.service.PirPersonDetectService");
+        intent.setComponent(componentName);
+
+//        startService(intent);
+//        Intent intent = new Intent(this,PirPersonDetectService.class);
         stopService(intent);
     }
 
     public void startFaceDetect(View view) {
-//        Log.e(TAG,"开始人脸检测服务");
+        Log.e(TAG,"开始人脸检测服务");
 //        Intent intent = new Intent(this, FaceDetectService.class);
 //        intent.putExtra("startType","active_interaction");
 ////        intent.putExtra("cmd","1"); //blockly使用：用户id
@@ -79,18 +89,26 @@ public class PersonListActivity extends AppCompatActivity {
 //        Intent intent = new Intent(this, FaceTrackActivity.class);
 //        startActivity(intent);
 
-        Intent intent = new Intent(this,FaceDetectService.class);
+        Intent intent = new Intent();
+        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv","com.yongyida.yydrobotcv.service.FaceDetectService");
+        intent.setComponent(componentName);
         intent.putExtra("startType", "active_interaction");
-        intent.putExtra("msg","sayHello");
+        intent.putExtra("msg","notSayHello");
         startService(intent);
     }
 
     public void stopFaceDetect(View view) {
         Log.e(TAG,"关闭人脸检测服务");
-        Intent intent = new Intent(this, FaceDetectService.class);
-        intent.putExtra("startType","stopTest");
-        intent.putExtra("cmd","1"); //blockly使用用户id
-        intent.putExtra("tag","-1");//-1直接调用停止
+//        Intent intent = new Intent(this, FaceDetectService.class);
+//        intent.putExtra("startType","stopTest");
+//        intent.putExtra("cmd","1"); //blockly使用用户id
+//        intent.putExtra("tag","-1");//-1直接调用停止
+//        startService(intent);
+
+        Intent intent = new Intent();
+        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv","com.yongyida.yydrobotcv.service.FaceDetectService");
+        intent.setComponent(componentName);
+        intent.putExtra("startType", "stopTest");
         startService(intent);
 
     }
