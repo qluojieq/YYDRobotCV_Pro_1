@@ -5,9 +5,10 @@ public class CorpusConstants {
 
     public static final String SIR = "sir";
     public static  final String MADAM = "madam";
-    public static final String NO_PERSON = "noPerson";
+    public static final String NO_SEX = "noPerson";
     public static final String VIP_SIR = "vipSir";
     public static final String VIP_MADAM = "vipMadam";
+    public static final String NO_SEX_VIP = "noSexVip";
 
 
 
@@ -19,12 +20,12 @@ public class CorpusConstants {
 
     public static String[] MadamSays = new String[]{
             "小姐姐，你真好看",
-            "姐姐，姐姐，我是可爱的机器人，你是可爱",
+            "姐姐，姐姐，你是可爱，我是可爱的机器人",
             "姐姐，这是我的手背，这是我的手心，你是我的宝贝",
             "对面的女孩看过来，看过来，看过来，小勇的表演很精采，请不要假装不理不采" // 唱歌
     };
 
-    public static String[] NoMan = new String[]{
+    public static String[] NoSex = new String[]{
             "莫文蔚的阴天，孙燕姿的雨天，周杰伦的晴天，都不如你和我聊天", // 微笑
             "我把万千技能装进身体，只为‘灵’气满满的等候你",
             "我是小勇，很高兴为您服务！"
@@ -35,7 +36,9 @@ public class CorpusConstants {
     public static String[] VipWoman = new String[]{
             "女士，我是小勇，很高兴为您服务！"
     };
-
+    public static String[] NosSexVip = new String[]{
+            "，我是小勇，很高兴为您服务！"
+    };
 
     // 不同人说不同的话
     public static String SayHelloWords(String whoType, String name) {
@@ -52,9 +55,9 @@ public class CorpusConstants {
                 index = random.nextInt(MadamSays.length);
                 ret = MadamSays[index];
                 break;
-            case NO_PERSON:
-                index = random.nextInt(NoMan.length);
-                ret = NoMan[index];
+            case NO_SEX:
+                index = random.nextInt(NoSex.length);
+                ret = NoSex[index];
                 break;
             case VIP_SIR:
                 index = random.nextInt(VipMan.length);
@@ -63,6 +66,10 @@ public class CorpusConstants {
             case VIP_MADAM:
                 index = random.nextInt(VipWoman.length);
                 ret = name + VipWoman[index];
+                break;
+            case NO_SEX_VIP:
+                index = random.nextInt(NosSexVip.length);
+                ret = name + NosSexVip[index];;
                 break;
         }
         return ret;

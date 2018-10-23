@@ -38,24 +38,15 @@ public class PirPersonDetectService extends Service {
             Log.e(TAG, "pir success " + pirValue.isHasPeople());
             if (pirValue != null && !isPersonOn) {
                 isPersonOn = true;
-                if (ultraDistance < FAR_DISTANCE) {
-                    if (isInDistance()) {
-                        TTSManager.TTS("你好"+" 让我好好看看", null);
+
+//                    if (isInDistance()) {
+                        TTSManager.TTS("你好 ， 嘻嘻 ！", null);
                         Intent intent = new Intent(PirPersonDetectService.this,FaceDetectService.class);
                         intent.putExtra("startType", "active_interaction");
                         intent.putExtra("msg","sayHello");
                         startService(intent);
                         // 问候
-                    } else {
-                        TTSManager.TTS("你好!", null);
-                        Intent intent = new Intent(PirPersonDetectService.this,FaceDetectService.class);
-                        intent.putExtra("startType", "active_interaction");
-                        intent.putExtra("msg","notSayHello");
-                        startService(intent);
-                        // 启动追踪
-                    }
-
-                }
+//                    }
             }
 
         }
@@ -69,8 +60,7 @@ public class PirPersonDetectService extends Service {
         @Override
         public void onSuccess(Ultrasonic ultrasonic) {
             if (ultrasonic != null) {
-                ultraDistance = ultrasonic.getDistances()[5];
-                Log.e(TAG,"当前检测到的PIR 中检测中的距离 " + ultraDistance);
+                ultraDistance = ultrasonic.getDistances()[5];  // 逻辑值
             }
         }
 
@@ -142,7 +132,7 @@ public class PirPersonDetectService extends Service {
     }
     public static boolean isInDistance(){
         boolean ret = false;
-        if (ultraDistance>STOP_DISTANCE&&ultraDistance<LOW_DISTANCE)
+        if (ultraDistance<FAR_DISTANCE&&ultraDistance>0)
             ret = true;
         return ret;
     }

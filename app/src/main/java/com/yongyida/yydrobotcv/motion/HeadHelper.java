@@ -20,17 +20,30 @@ public class HeadHelper {
     private static SteeringControl mHeadLeftRight = mHeadControl.getHeadLeftRightControl();
     private static SteeringControl mHeadUpDown = mHeadControl.getHeadUpDownControl();
 
-    public static int stepLR = 12;
+    public static int stepLRH = 25; //默认 12
+    public static int stepLRL= 10; //默认 12
+
     public static int stepUD = 10;
 
-    // 跟踪运动控制
-    public static void initLRhead(Context context) {
+// 跟踪运动控制
+    public static void initLRheadL(Context context) {
         mHeadControl.setAction(HeadControl.Action.LEFT_RIGHT);
         mHeadLeftRight.setMode(SteeringControl.Mode.DISTANCE_SPEED);
         mHeadLeftRight.getDistance().setType(SteeringControl.Distance.Type.BY);
-        mHeadLeftRight.getDistance().setValue(10 * stepLR);
+        mHeadLeftRight.getDistance().setValue(10 * stepLRL);
         mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
-        mHeadLeftRight.getSpeed().setValue(65);
+        mHeadLeftRight.getSpeed().setValue(10);
+        SendClient.getInstance(context).send(null, mHeadControl, null);
+    }
+
+    // 跟踪运动控制
+    public static void initLRheadH(Context context) {
+        mHeadControl.setAction(HeadControl.Action.LEFT_RIGHT);
+        mHeadLeftRight.setMode(SteeringControl.Mode.DISTANCE_SPEED);
+        mHeadLeftRight.getDistance().setType(SteeringControl.Distance.Type.BY);
+        mHeadLeftRight.getDistance().setValue(10 * stepLRH);
+        mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
+        mHeadLeftRight.getSpeed().setValue(100);
         SendClient.getInstance(context).send(null, mHeadControl, null);
     }
 
@@ -72,18 +85,29 @@ public class HeadHelper {
         SendClient.getInstance(context).send(null,mFoodControl,null);
     }
 
-    public static void headLeft(Context context) {
+    public static void headLeftL(Context context) {
         mHeadLeftRight.setNegative(true);
-        initLRhead(context);
+        initLRheadL(context);
         Log.e(TAG, "headLeft");
     }
 
-    public static void headRight(Context context) {
+    public static void headRightL(Context context) {
         mHeadLeftRight.setNegative(false);
-        initLRhead(context);
+        initLRheadL(context);
         Log.e(TAG, "headRight");
     }
 
+    public static void headLeftH(Context context) {
+        mHeadLeftRight.setNegative(true);
+        initLRheadH(context);
+        Log.e(TAG, "headLeft");
+    }
+
+    public static void headRightH(Context context) {
+        mHeadLeftRight.setNegative(false);
+        initLRheadH(context);
+        Log.e(TAG, "headRight");
+    }
 
     public static void headUp(Context context) {
 

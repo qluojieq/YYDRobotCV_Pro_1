@@ -142,11 +142,11 @@ public class PersonListActivity extends AppCompatActivity {
     }
 
     public void RightMotion(View view) {
-        HeadHelper.headRight(this);
+        HeadHelper.headRightL(this);
     }
 
     public void LeftMotion(View view) {
-        HeadHelper.headLeft(this);
+        HeadHelper.headLeftH(this);
     }
 
     public void StopMotion(View view) {
