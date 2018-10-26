@@ -4,10 +4,10 @@ android {
     compileSdkVersion 28
     defaultConfig {
         applicationId "com.yongyida.yydrobotcv"
-        minSdkVersion 22
+        minSdkVersion 23
         targetSdkVersion 28
         versionCode 1
-        versionName "v1.0.1021"
+        versionName "v1.18.1021"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
             abiFilters( "armeabi-v7a")
@@ -42,8 +42,8 @@ dependencies {
     //    implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
     implementation(name: 'Android-PickerView-3.2.7', ext: 'aar')
     // 头部运动
-    implementation(name: 'communicate_app-2.0.1', ext: 'aar')
-    implementation(name: 'communicate_app_hardware-2.0.3', ext: 'aar')
+    implementation(name: 'communicate_app-2.0.2', ext: 'aar')
+    implementation(name: 'communicate_app_hardware-2.0.7', ext: 'aar')
     implementation 'com.google.code.gson:gson:2.2.4'
     implementation files('libs/OrbbecSDK_v1.1.4_170224_pro.jar')
     implementation files('libs/pinyin4j-2.5.0.jar')

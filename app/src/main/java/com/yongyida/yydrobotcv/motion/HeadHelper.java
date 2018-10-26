@@ -6,7 +6,10 @@ import android.util.Log;
 import com.yongyida.robot.communicate.app.common.send.SendClient;
 import com.yongyida.robot.communicate.app.hardware.motion.send.data.FootControl;
 import com.yongyida.robot.communicate.app.hardware.motion.send.data.HeadControl;
+import com.yongyida.robot.communicate.app.hardware.motion.send.data.SoundLocationControl;
 import com.yongyida.robot.communicate.app.hardware.motion.send.data.SteeringControl;
+
+import static com.yongyida.robot.communicate.app.hardware.motion.send.data.SoundLocationControl.Type.REQUEST;
 
 /**
  * @author Brandon on 2018/8/2
@@ -19,20 +22,41 @@ public class HeadHelper {
     private static HeadControl mHeadControl = new HeadControl();
     private static SteeringControl mHeadLeftRight = mHeadControl.getHeadLeftRightControl();
     private static SteeringControl mHeadUpDown = mHeadControl.getHeadUpDownControl();
+    private static SoundLocationControl mSoundLocationControl = new SoundLocationControl();
 
-    public static int stepLRH = 25; //默认 12
-    public static int stepLRL= 10; //默认 12
+
+    public static int stepLRH = 8; //默认 12
+    public static int stepLRL= 8; //默认 12
 
     public static int stepUD = 10;
+
+    //  头脚联动
+    public static void linkedLeft(Context context){
+        Log.e(TAG,"头脚联动  左");
+        mSoundLocationControl.setMode(SoundLocationControl.Mode.HEAD_FOOT);
+        mSoundLocationControl.setType(REQUEST);
+        mSoundLocationControl.setAngle(8);
+        SendClient.getInstance(context).send(null, mSoundLocationControl, null);
+    }
+
+    //  头脚联动
+    public static void linkedRight(Context context){
+        Log.e(TAG,"头脚联动  右");
+        mSoundLocationControl.setMode(SoundLocationControl.Mode.HEAD_FOOT);
+        mSoundLocationControl.setType(REQUEST);
+        mSoundLocationControl.setAngle(352);
+        SendClient.getInstance(context).send(null, mSoundLocationControl, null);
+    }
 
 // 跟踪运动控制
     public static void initLRheadL(Context context) {
         mHeadControl.setAction(HeadControl.Action.LEFT_RIGHT);
         mHeadLeftRight.setMode(SteeringControl.Mode.DISTANCE_SPEED);
         mHeadLeftRight.getDistance().setType(SteeringControl.Distance.Type.BY);
-        mHeadLeftRight.getDistance().setValue(10 * stepLRL);
+        mHeadLeftRight.getDistance().setUnit(SteeringControl.Distance.Unit.PERCENT);
+        mHeadLeftRight.getDistance().setValue(stepLRL);
         mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
-        mHeadLeftRight.getSpeed().setValue(10);
+        mHeadLeftRight.getSpeed().setValue(68);
         SendClient.getInstance(context).send(null, mHeadControl, null);
     }
 
@@ -41,9 +65,10 @@ public class HeadHelper {
         mHeadControl.setAction(HeadControl.Action.LEFT_RIGHT);
         mHeadLeftRight.setMode(SteeringControl.Mode.DISTANCE_SPEED);
         mHeadLeftRight.getDistance().setType(SteeringControl.Distance.Type.BY);
-        mHeadLeftRight.getDistance().setValue(10 * stepLRH);
+        mHeadLeftRight.getDistance().setUnit(SteeringControl.Distance.Unit.PERCENT);
+        mHeadLeftRight.getDistance().setValue(stepLRH);
         mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
-        mHeadLeftRight.getSpeed().setValue(100);
+        mHeadLeftRight.getSpeed().setValue(68);
         SendClient.getInstance(context).send(null, mHeadControl, null);
     }
 

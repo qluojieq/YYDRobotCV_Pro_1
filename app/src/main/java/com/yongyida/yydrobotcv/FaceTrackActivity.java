@@ -9,13 +9,20 @@ import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 
+import com.yongyida.yydrobotcv.camera.CameraBase;
+import com.yongyida.yydrobotcv.motion.HeadHelper;
 import com.yongyida.yydrobotcv.service.PersonDetectService;
+import com.yongyida.yydrobotcv.utils.CommonUtils;
 import com.yongyida.yydrobotcv.utils.TrackUtil;
 
 import java.util.List;
 
 import dou.utils.DLog;
 import mobile.ReadFace.YMFace;
+
+import static com.yongyida.yydrobotcv.motion.HeadHelper.linkedLeft;
+import static com.yongyida.yydrobotcv.motion.HeadHelper.linkedRight;
+
 
 /**
  * Created by mac on 16/7/4.
@@ -57,6 +64,25 @@ public class FaceTrackActivity extends BaseCameraActivity {
 
     private SimpleArrayMap<Integer, YMFace> trackingMap;
     private int totalCount = 0;
+    boolean isTrackOn = true;
+
+    // 跟随限定参数
+    public static final int TRACK_RANGE_HEIGHT = 360;
+    public static final int TRACK_RANGE_WIDTH = 500; //
+
+    // 分辨率
+     public static final int HEIGHT_PREVIEW = 1080;
+     public static final int WIDTH_PREVIEW = 1920;
+    //跟随的上下限
+    public  static final int TRACK_TOP = (HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
+    public  static final int TRACK_BOTTOM = HEIGHT_PREVIEW - TRACK_TOP;
+    // 跟随的左右限制
+    public static final int TRACK_RIGHT = TRACK_RANGE_WIDTH;
+    public  static final int TRACK_LEFT = WIDTH_PREVIEW - TRACK_RANGE_WIDTH - 100;
+
+    public  static float trackCenterX = 960;
+    public static float trackCenterY = 540;
+    public static int speedUpLength = 60;
     @Override
     protected List<YMFace> analyse(byte[] bytes, final int iw, final int ih) {
 
@@ -66,6 +92,7 @@ public class FaceTrackActivity extends BaseCameraActivity {
 
         if (faces != null && faces.size() > 0) {
             Log.e(TAG,"face");
+
 
             if (!preFrame) {
                 if (!threadStart) {
@@ -79,9 +106,26 @@ public class FaceTrackActivity extends BaseCameraActivity {
                             maxIndex = i;
                         }
                     }
-
                     final YMFace ymFace = faces.get(maxIndex);
                     final int anaIndex = maxIndex;
+                    final float[] rect = ymFace.getRect();
+                    //    此逻辑不利于判断，由于测距本身不准且旁边的没有相应的测距传感器
+                    if (isTrackOn) { // 跟随运动逻辑
+                        CommonUtils.serviceToast(this, "trackId " + ymFace.getTrackId());
+                        trackCenterX = (rect[0] - rect[2] / 2);
+                        trackCenterY = (rect[1] + rect[3] / 2);
+                        Log.e(TAG,"center x " + trackCenterX  + "trackLeft " + TRACK_LEFT + "trackRight " + TRACK_RIGHT);
+                        if (trackCenterX > TRACK_LEFT) {
+                            linkedLeft(this);
+                        } else if (trackCenterX < TRACK_RIGHT) {
+                            linkedRight(this);
+                        }
+                        if (trackCenterY < TRACK_TOP) {
+                            HeadHelper.headUp(this);
+                        } else if (trackCenterY > TRACK_BOTTOM) {
+                            HeadHelper.headDown(this);
+                        }
+                    }
                     new Thread(new Runnable() {
                         @Override
                         public void run() {
@@ -95,27 +139,18 @@ public class FaceTrackActivity extends BaseCameraActivity {
                                             || Math.abs(headposes[2]) > 30)) {
                                         int gender = faceTrack.getGender(anaIndex);
                                         int gender_confidence = faceTrack.getGenderConfidence(anaIndex);
-                                        //识别
-
-
-                                        float [] feature1 = faceTrack.getFaceFeature(0);
-                                        int personId =  getMostSimilar(feature1,gender);
-                                        ymFace.setPersonId(personId);
-                                        //人流统计
                                         totalCount ++;
                                         //颜值UnsatisfiedLinkError
                                         Log.e(TAG,"颜值"+trackId);
                                         ymFace.setBeautyScore(faceTrack.getFaceBeautyScore(anaIndex));
-                                        //眼镜
-//                                        ymFace.setGlassValue(faceTrack.getGlassValue(anaIndex));
                                         //有可能获取性别可信度不够高，需重新获取
                                         DLog.d(gender + " ：" + gender_confidence);
                                         if (gender_confidence >= 90) {
                                             ymFace.setAge(faceTrack.getAge(anaIndex));
+                                            ymFace.setPersonId(faceTrack.getFaceQuality(anaIndex));
                                             ymFace.setGender(gender);
                                             trackingMap.put(trackId, ymFace);
                                         }
-
                                     }
                                 }
                             } catch (Exception e) {
@@ -132,7 +167,7 @@ public class FaceTrackActivity extends BaseCameraActivity {
                     int trackId = ymFace.getTrackId();
                     if (trackingMap.containsKey(trackId)) {
                         YMFace face = trackingMap.get(trackId);
-                        ymFace.setEmotions(faceTrack.getEmotion(i));
+//                        ymFace.setEmotions(faceTrack.getEmotion(i));
                         ymFace.setAge(face.getAge());
                         ymFace.setFaceQuality(totalCount);
                         ymFace.setBeautyScore(face.getBeautyScore());
@@ -154,13 +189,6 @@ public class FaceTrackActivity extends BaseCameraActivity {
         }else {
 
             noFaceCount ++; // 没有就叠加
-            if (noFaceCount == NO_FACE_THRESHOLD){
-                Intent intent = new Intent(this, PersonDetectService.class);
-                intent.putExtra("startType","start");
-                startService(intent);
-                Log.e(TAG,"结束人脸检测，开始人体检测");
-                FaceTrackActivity.this.finish();
-            }
             Log.e(TAG,"no face " + noFaceCount);
         }
         return faces;
@@ -174,9 +202,5 @@ public class FaceTrackActivity extends BaseCameraActivity {
         String name = "";
         return  name;
     }
-
-
-
-
 
 }

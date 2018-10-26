@@ -55,12 +55,13 @@ import static dou.utils.HandleUtil.runOnUiThread;
 
 /**
  * @author Brandon on 2018/4/10
+ *  Brandon update  2018/10/25
  **/
 public class RegisterCameraFragment extends Fragment implements CameraHelper.PreviewFrameListener {
 
     private final String TAG = RegisterCameraFragment.class.getSimpleName();
 
-    private static final int BASIC_FRAME_RATE = 20;//可能需要调试确认
+    private static final int BASIC_FRAME_RATE = 5;//可能需要调试确认原20
 
     private static final int BASIC_FRAME_RATE_PERSON = 10;
 
@@ -78,19 +79,16 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
     private long voiceOnCount = 0;
     private long voiceWarnCount = 0;
 
-    private final boolean isDrawFrame = false;
-
     public SurfaceView preview_surface;
-    public SurfaceView draw_surface;
+
     TextView hintFaceView;
     TextView hintFaceInView;
     protected CameraHelper mCameraHelper;
     protected YMFaceTrack faceTrack;
     Context mContext;
 
-    protected int iw = 0, ih;
-    private float scale_bit;
-    private boolean showFps = false;
+    protected int iw = 1920, ih = 1080;
+
     private List<Float> timeList = new ArrayList<>();
     protected boolean stop = false;
     //camera_max_width值为-1时, 找大于640分辨率为屏幕宽高等比
@@ -107,7 +105,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
     public boolean isVoiceOn = false;
 
     //对于每种情况预览帧数进程测试,10稍慢
-    int TOTAL_STEP = 5;
+    int TOTAL_STEP = 1;
     //从0开始，0,1,2；共三步
     int currentStep = 0;
     int viewCountStep1 = 0;
@@ -149,7 +147,6 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
                 RegisterCameraFragment.this.getActivity().finish();
             }
         });
-        faceFrame = BitmapFactory.decodeResource(this.getResources(), R.mipmap.ic_face_frame);
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -210,12 +207,6 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
 
     }
 
-
-    ///使用soundPool发声
-    void playSound1(int type) {//咔嚓
-        ((RegisterActivity) getActivity()).playSound(type);
-    }
-
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         if (camera_long == 0) camera_long = System.currentTimeMillis();
@@ -225,44 +216,28 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
             camera_count = 0;
             camera_long = 0;
         }
-        initCameraMsg();
+
+        Log.e(TAG," 帧率 " + camera_fps);
         if (!stop) {
             runTrack(bytes);
         }
     }
 
-    private void runTrack(byte[] data) {
+    Thread thread;
+    boolean isThreadBusy = false;
+    private void runTrack(final byte[] data) {
         try {
-
-            long time = System.currentTimeMillis();
-            final List<YMFace> faces = analyse(data, iw, ih);
-
-            String str = "";
-            StringBuilder fps = new StringBuilder();
-            if (showFps) {
-                fps.append("fps = ");
-                long now = System.currentTimeMillis();
-                float than = now - time;
-                timeList.add(than);
-                if (timeList.size() >= 20) {
-                    float sum = 0;
-                    for (int i = 0; i < timeList.size(); i++) {
-                        sum += timeList.get(i);
+            if (!isThreadBusy){
+                isThreadBusy = true;
+                thread = new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        analyse(data, iw, ih);
+                        isThreadBusy = false;
                     }
-                    fps.append(String.valueOf((int) (1000f * timeList.size() / sum)))
-                            .append(" camera ")
-                            .append(camera_fps);
-                    timeList.remove(0);
-                }
+                });
+                thread.start();
             }
-//            final String fps1 = fps.toString() + str;
-            final String fps1 = "";
-            runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    drawAnim(faces, draw_surface, scale_bit, getCameraId(), fps1);
-                }
-            });
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -273,11 +248,11 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         sw = DisplayUtil.getScreenWidthPixels(mContext);
         sh = DisplayUtil.getScreenHeightPixels(mContext);
         preview_surface = view.findViewById(R.id.camera_preview);
-        draw_surface = view.findViewById(R.id.draw_view);
+
         hintFaceView = view.findViewById(R.id.hint_face_side);
         hintFaceInView = view.findViewById(R.id.hint_face_side_up);
-        draw_surface.setZOrderOnTop(true);
-        draw_surface.getHolder().setFormat(PixelFormat.TRANSLUCENT);
+
+
         //预设Camera参数，方便扩充
         CameraParams params = new CameraParams();
         //优先使用的camera Id,
@@ -300,7 +275,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
     }
 
     public synchronized void stopTrack() {
-        clearDrawSurface();
+
         if (faceTrack == null) {
             DLog.d("already release track");
             return;
@@ -319,7 +294,6 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
 
         stop = false;
 
-        iw = 0;//重新调用initCameraMsg的开关
         faceTrack = new YMFaceTrack();
 
         //设置人脸检测距离，默认近距离，需要在initTrack之前调用
@@ -329,121 +303,32 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         int result = faceTrack.initTrack(this.getActivity(), YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640);
 
         //设置人脸识别置信度，设置75，不允许修改
-
+        faceTrack.setRecognitionConfidence(75);
         if (result == 0) {
             DLog.d("初始化成功");
-//            new ToastUtil(mContext).showSingletonToast("初始化检测器成功");
-
         } else {
             DLog.d("初始化失败");
-//            new ToastUtil(mContext).showSingletonToast("初始化检测器失败");
         }
         DLog.d("getAlbumSize: " + faceTrack.getAlbumSize());
     }
 
-    private void initCameraMsg() {
-        if (iw == 0) {
-
-            int surface_w = preview_surface.getLayoutParams().width;
-            int surface_h = preview_surface.getLayoutParams().height;
-
-
-            iw = mCameraHelper.getPreviewSize().width;
-            ih = mCameraHelper.getPreviewSize().height;
-
-
-            int orientation = 0;
-            ////注意横屏竖屏问题
-            DLog.d(getResources().getConfiguration().orientation + " : " + Configuration.ORIENTATION_PORTRAIT);
-            if (sw < sh) {
-                scale_bit = surface_w / (float) ih;
-                if (mCameraHelper.getCameraId() == Camera.CameraInfo.CAMERA_FACING_BACK) {
-                    orientation = YMFaceTrack.FACE_270;
-                } else {
-                    orientation = YMFaceTrack.FACE_90;
-                }
-            } else {
-                scale_bit = surface_h / (float) ih;
-                orientation = YMFaceTrack.FACE_0;
-            }
-            if (faceTrack == null) {
-                iw = 0;
-                return;
-            }
-
-            faceTrack.setOrientation(orientation);
-            Log.e(TAG, "orientation " + orientation);
-            ViewGroup.LayoutParams params = draw_surface.getLayoutParams();
-            params.width = surface_w;
-            params.height = surface_h;
-            draw_surface.requestLayout();
-            Log.e(TAG, "跟踪时使用的 iw " + iw + " ih" + ih + "surface_w" + surface_w + "surface_h" + surface_h);
-        }
-    }
-
-    public int getCameraId() {
-        return mCameraHelper.getCameraId();
-    }
-
-    //动画处理
-    protected void drawAnim(List<YMFace> faces, SurfaceView outputView, float scale_bit, int cameraId, String fps) {
-        if (isDrawFrame) {
-            Log.e(TAG, "drawAnim");
-
-            Paint paint = new Paint();
-            paint.setAntiAlias(true);
-            Canvas canvas = outputView.getHolder().lockCanvas();
-
-            if (canvas == null) return;
-            try {
-
-                canvas.drawColor(0, PorterDuff.Mode.CLEAR);
-                int viewW = outputView.getLayoutParams().width;
-                int viewH = outputView.getLayoutParams().height;
-                if (faces == null || faces.size() == 0) return;
-
-                for (int i = 0; i < faces.size(); i++) {
-                    int size = DisplayUtil.dip2px(mContext, 2);
-                    paint.setStrokeWidth(size);
-                    paint.setStyle(Paint.Style.STROKE);
-                    YMFace ymFace = faces.get(i);
-                    float[] rect = ymFace.getRect();
-                    float[] pose = ymFace.getHeadpose();
-                    float x1 = rect[0] * scale_bit;
-                    float y1 = rect[1] * scale_bit;
-                    float rect_width = rect[2] * scale_bit;
-
-                    //draw rect
-                    RectF rectf = new RectF(x1, y1, x1 + rect_width, y1 + rect_width);
-//                canvas.drawRect(rectf, paint);
-                    surfaceDraw(rectf, canvas);
-
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                outputView.getHolder().unlockCanvasAndPost(canvas);
-            }
-        }
-
-    }
-
     //数据处理
-    protected List<YMFace> analyse(byte[] bytes, int iw, int ih) {
-        if (faceTrack == null) return null;
+    protected void analyse(byte[] bytes, int iw, int ih) {
+        if (faceTrack == null) return ;
         final List<YMFace> faces = faceTrack.trackMulti(bytes, iw, ih);
         if (isVoiceOn) {//播放音乐中
-            voiceOnCount++;
-            if (voiceOnCount > SOUND_VOICE_THRESHOLD) {
-                isVoiceOn = false;
-                voiceOnCount = 0;
-            }
+            voiceOnCount ++;
             Log.e(TAG, "播放音乐中" + voiceOnCount);
-            return faces;
+            if (voiceOnCount>SOUND_VOICE_THRESHOLD){
+                voiceOnCount = 0;
+                isVoiceOn = false;
+            }
+            return ;
         }
         if (faces != null && faces.size() > 0) {
             YMFace ymFace = faces.get(0);
-
+            ymFace.setFaceQuality(faceTrack.getFaceQuality(0));
+            Log.e(TAG,"注册时的  画面质量 " + ymFace.getFaceQuality());
             int id = faceTrack.identifyPerson(0);
             if (id>0&&!isSameFaceChecked){
                 isSameFaceChecked = true;
@@ -475,14 +360,12 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
                 isSameFaceChecked = true;
             }
 
-
-
             if (isFaceIn(ymFace)) {
                 noPersonCount = 0;
                 voiceWarnCount = 0;
             } else {
                 noPersonDetect();
-                return faces;
+                return ;
             }
             if (currentStep == 0 && isFrontFace(ymFace)) {
                 viewCountStep1++;
@@ -533,7 +416,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
                 mHandler.sendEmptyMessage(4);
             }
         }
-        return faces;
+        return ;
     }
 
     private void noPersonDetect() {
@@ -558,8 +441,12 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         float x = facePose[0];
         float y = facePose[1];
         float z = facePose[2];
-        if (Math.abs(x) < 10 && Math.abs(y) < 10 && Math.abs(z) < 10)
+
+        if (Math.abs(x) < 10 && Math.abs(y) < 10 && Math.abs(z) < 10&&ymFace.getFaceQuality()>6){
             ret = true;
+            isVoiceOn = true;
+        }
+
         return ret;
     }
 
@@ -598,8 +485,11 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         boolean ret = false;
         float facePose[] = ymFace.getHeadpose();
         float z = facePose[2];
-        if (Math.abs(z) > 15)
+        if (Math.abs(z) > 15&&ymFace.getFaceQuality()> 5){
             ret = true;
+            isVoiceOn = true;
+        }
+
         return ret;
     }
 
@@ -608,7 +498,11 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         boolean ret = false;
         float facePose[] = ymFace.getHeadpose();
         float y = facePose[1];
-        if (y < -15) ret = true;
+        if (y < -10&&ymFace.getFaceQuality()> 6)
+        {
+            ret = true;
+            isVoiceOn = true;
+        }
         return ret;
     }
 
@@ -616,13 +510,11 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
 
     void addFace1(byte[] bytes, float[] rect) {
 
-
         personId = faceTrack.addPerson(0);//添加人脸
         registerUser.setAge(faceTrack.getAge(0) + "");
         registerUser.setGender(faceTrack.getGender(0) + "");
         currentRegisterId = personId;
         Log.e(TAG, "起始 年龄" + faceTrack.getAge(0) + "性别 " + faceTrack.getGender(0));
-
 
         if (personId > 0) {
             registerUser.setPersonId(personId + "");
@@ -677,34 +569,9 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
 
     @Override
     public void onDestroy() {//释放
-        faceFrame.recycle();
         super.onDestroy();
     }
 
-    Bitmap faceFrame;
-
-    public void surfaceDraw(RectF rect, Canvas canvas) {
-        Paint mPaint = new Paint();
-        mPaint.setColor(Color.BLUE);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeWidth(2f);
-        mPaint.setTextSize(40f);
-
-        if (canvas != null) {
-            canvas.drawColor(Color.TRANSPARENT, PorterDuff.Mode.CLEAR);
-            canvas.drawBitmap(faceFrame, null, rect, mPaint);
-        }
-    }
-
-    public void clearDrawSurface() {
-        Canvas canvas = draw_surface.getHolder().lockCanvas();
-        Paint paint = new Paint();
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.CLEAR));
-        canvas.drawPaint(paint);
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC));
-        draw_surface.invalidate();
-        draw_surface.getHolder().unlockCanvasAndPost(canvas);
-    }
 
     public void reInit() {
         mHandler.sendEmptyMessageDelayed(0, 500);
@@ -728,8 +595,6 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         if (600 < centerX && centerX < 1100 && centerY > 300 && centerY < 800) {
             ret = true;
         }
-
-//        Log.e(TAG,"face  x " + x + "face y " + y + " w " + w + " h " + h);
         return ret;
     }
 

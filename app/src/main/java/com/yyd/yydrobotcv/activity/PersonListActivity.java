@@ -60,7 +60,7 @@ public class PersonListActivity extends AppCompatActivity {
 //        intent.putExtra("startType","start");
 //        startService(intent);
         Intent intent = new Intent();
-//        intent.setAction("com.yongyda.yydrobotcv.pirfaceservice");
+        intent.putExtra("startType","start");
         ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv","com.yongyida.yydrobotcv.service.PirPersonDetectService");
         intent.setComponent(componentName);
         startService(intent);
@@ -123,9 +123,9 @@ public class PersonListActivity extends AppCompatActivity {
     private static final String FRAGMENT_DIALOG = "dialog";
 
     public void startFFGame(View view) { // 猜拳游戏
-        ComponentName componentName = new ComponentName("com.yydrobo.yydrobofggame","com.yydrobo.yydrobofggame.activity.StartActivity");
-        Intent intent = new Intent();
-        intent.setComponent(componentName);
+//        ComponentName componentName = new ComponentName("com.yydrobo.yydrobofggame","com.yydrobo.yydrobofggame.activity.StartActivity");
+        Intent intent = new Intent(this,FaceTrackActivity.class);
+//        intent.setComponent(componentName);
         startActivity(intent);
     }
 
@@ -154,11 +154,13 @@ public class PersonListActivity extends AppCompatActivity {
     }
 
     public void RightMotionFoot(View view) {
-        HeadHelper.headFootBackRight(this);
+//        HeadHelper.headFootBackRight(this);
+        HeadHelper.linkedLeft(this);
     }
 
     public void LeftMotionFoot(View view) {
-        HeadHelper.headFootBackLeft(this);
+//        HeadHelper.headFootBackLeft(this);
+        HeadHelper.linkedRight(this);
     }
 
 

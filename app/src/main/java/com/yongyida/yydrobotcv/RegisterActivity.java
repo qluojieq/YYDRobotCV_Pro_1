@@ -2,6 +2,7 @@ package com.yongyida.yydrobotcv;
 
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
+import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
 import android.media.AudioAttributes;
 import android.media.SoundPool;
@@ -19,6 +20,7 @@ import com.yongyida.yydrobotcv.customview.ExitDialog;
 import com.yongyida.yydrobotcv.fragment.RegisterBaseInfoFragment;
 import com.yongyida.yydrobotcv.fragment.RegisterCameraFragment;
 import com.yongyida.yydrobotcv.fragment.RegisterVipFragment;
+import com.yongyida.yydrobotcv.service.PirPersonDetectService;
 import com.yongyida.yydrobotcv.tts.TTSManager;
 import com.yongyida.yydrobotcv.useralbum.User;
 import com.yongyida.yydrobotcv.useralbum.UserDataSupport;
@@ -57,6 +59,7 @@ public class RegisterActivity extends FragmentActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+
         initSoundPool();
         setContentView(R.layout.main_enroll_activity);
         registerFrame = findViewById(R.id.register_frame);
@@ -241,6 +244,10 @@ public class RegisterActivity extends FragmentActivity {
     protected void onDestroy() {
         super.onDestroy();
         soundPool.release();
+        // 结束注册之后，告诉无人
+        Intent intent = new Intent(this, PirPersonDetectService.class);
+        intent.putExtra("startType", "noFace");
+        startService(intent);
     }
 
     public void playSound(int type){

@@ -21,6 +21,7 @@ import com.yongyida.yydrobotcv.tts.CorpusConstants;
 import com.yongyida.yydrobotcv.tts.TTSManager;
 import com.yongyida.yydrobotcv.useralbum.User;
 import com.yongyida.yydrobotcv.useralbum.UserDataSupport;
+import com.yongyida.yydrobotcv.utils.CommonUtils;
 import com.yongyida.yydrobotcv.utils.DrawUtil;
 
 import java.util.ArrayList;
@@ -41,8 +42,8 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
 
     public static final String START_TYPE_BLOCKLY = "blockly"; // blockly 编程 使用
     public static final String START_TYPE_ACTIVE_INTERACTION = "active_interaction";  // 主动交互使用
-    public static final String START_TYPE_ACTIVE_TEST_START = "startTest";  // 主动交互使用
-    public static final String START_TYPE_ACTIVE_TEST_STOP = "stopTest";  // 主动交互使用
+    public static final String START_TYPE_ACTIVE_TEST_START = "startTest";  // 开始工厂模式使用
+    public static final String START_TYPE_ACTIVE_TEST_STOP = "stopTest";  // 结束使用
 
 
     public static final String START_CMD = "cmd"; //  大于 0 ，-1为关闭人脸检测
@@ -50,21 +51,21 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     public static final String START_TAG = "tag"; //
 
     // 跟随限定参数
-    private static final int TRACK_RANGE_HEIGHT = 360;
-    private static final int TRACK_RANGE_WIDTH = 320; // 720过大
+    public static final int TRACK_RANGE_HEIGHT = 360;
+    public static final int TRACK_RANGE_WIDTH = 320; // 720过大
     //跟随的上下限
-    private static final int TRACK_TOP = (CameraBase.HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
-    private static final int TRACK_BOTTOM = CameraBase.HEIGHT_PREVIEW - TRACK_TOP;
+    public  static final int TRACK_TOP = (CameraBase.HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
+    public  static final int TRACK_BOTTOM = CameraBase.HEIGHT_PREVIEW - TRACK_TOP;
     // 跟随的左右限制
-    private static final int TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
-    private static final int TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
+    public static final int TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
+    public  static final int TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
 
-    private float trackCenterX = 640;
-    private float trackCenterY = 360;
+    public  static float trackCenterX = 640;
+    public static float trackCenterY = 360;
 
     //人脸检测超时设置
-    private static final int FACE_CHECK_COUNT = 20;  // 看很多眼也不认识，默认50
-    private static final int LONG_TIME_NO_FACE_THRESHOLD = 1000 * 500; // 没有人脸的处理阈值
+    private static final int FACE_CHECK_COUNT = 10;  // 看很多眼也不认识，默认50
+    private static final int LONG_TIME_NO_FACE_THRESHOLD = 1000 * 5; // 没有人脸的处理阈值
 
     private int faceCheckCount = 0;
 
@@ -79,10 +80,10 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
 
     boolean isTrackOn = true;
     String startType = START_TYPE_ACTIVE_INTERACTION;
-    String sayHello = "";
     boolean sayOnce = true;
     // 是否已经被说过
     ArrayList<Integer> userVisited;
+    ArrayList<float[]> userStrangerVisited;
 
 
     // blockly块
@@ -128,18 +129,23 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         withFaceTime = new Date().getTime();
 
         faceCheckCount = 0;
-        mQueryUltraValueControl.setAndroid(QueryUltrasonicControl.Android.SEND);
-        SendClient.getInstance(this).send(this, mQueryUltraValueControl, mSendUltraResponseListener);
         if (userVisited == null) {
             userVisited = new ArrayList<>();
+        }
+        if (userStrangerVisited == null) {
+            userStrangerVisited = new ArrayList<>();
         }
         startType = intent.getStringExtra(START_TYPE);
         Log.e(TAG, "startCommand " + startType);
         switch (startType) {
             case START_TYPE_ACTIVE_INTERACTION:
-                sayHello = intent.getStringExtra(START_MSG);
                 sayOnce = true;
-                cameraHelper.start();
+                cameraHelper.stop();
+                try {
+                    cameraHelper.start();
+                }catch (Exception e){
+                    CommonUtils.serviceToast(this,"相机打开失败 。。。");
+                }
                 initFaceTrack();
                 break;
             case START_TYPE_BLOCKLY:
@@ -168,6 +174,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
 
     @Override
     public void onDestroy() {
+
         cameraHelper.stop();
         stopTrack();
         Log.e(TAG, "onDestroy");
@@ -181,16 +188,10 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     long camera_long = 0;
     int camera_count = 0;
     int camera_fps = 0;
+
     @Override
     public void preview(byte[] bytes) {
-        if (camera_long == 0) camera_long = System.currentTimeMillis();
-        camera_count++;
-        if (System.currentTimeMillis() - camera_long > 1000) {
-            camera_fps = camera_count;
-            camera_count = 0;
-            camera_long = 0;
-        }
-        Log.e(TAG," fps + " + camera_fps);
+
         if (!stop) {
             synchronized (lock) {
                 runTrack(bytes);
@@ -206,7 +207,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         stop = true;
         faceTrack.onRelease();
         faceTrack = null;
-        SendClient.getInstance(this).send(this, mQueryUltraValueControl, null);
+//        SendClient.getInstance(this).send(this, mQueryUltraValueControl, null);
         DLog.d("release track success");
     }
 
@@ -221,6 +222,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         faceTrack.setDistanceType(YMFaceTrack.DISTANCE_TYPE_FAR);
         int result = faceTrack.initTrack(this, YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640);
         DLog.d("getAlbumSize1: " + faceTrack.getEnrolledPersonIds().size());
+
         boolean needUpdateFaceFeature = faceTrack.isNeedUpdateFaceFeature();
         if (needUpdateFaceFeature) {
             DLog.d("update result: " + faceTrack.updateFaceFeature());
@@ -238,45 +240,38 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     int faceId;
 
     private void runTrack(byte[] data) {
+        if (camera_long == 0) camera_long = System.currentTimeMillis();
+        camera_count++;
+        if (System.currentTimeMillis() - camera_long > 1000) {
+            camera_fps = camera_count;
+            camera_count = 0;
+            camera_long = 0;
+        }
         long startTime = new Date().getTime();
-        List<YMFace> faces = trackAnalyse(data, 1280, 720);  // 跟踪
-        recognizerLogic(faces); // 识别逻辑
+        trackAnalyse(data, 1280, 720);  // 跟踪
         long endTime = new Date().getTime();
-        Log.e(TAG, ultraDistance + "track cost time " + (endTime - startTime));
+        Log.e(TAG, " fps + " + camera_fps + "track cost time " + (endTime - startTime));
     }
 
-    public void recognizerLogic(final List<YMFace> faces) {
-        if (faces != null && faces.size() > 0) {  // 识别
-            Log.e(TAG, "检测到人脸 ");
-            withFaceTime = new Date().getTime();
+    public void recognizerLogic(final YMFace ymFace) {
+        if (ymFace != null) {  // 识别
             if (startType.equals(START_TYPE_BLOCKLY)) {
                 User user = DrawUtil.getUserFromPersonId(checkId);
                 if (user != null) {
                     blockBack(user.getUserName());
                 }
             } else if (startType.equals(START_TYPE_ACTIVE_INTERACTION)) {
-                YMFace ymFace = faces.get(0);
-                faceId = ymFace.getPersonId();
-                final float[] headposes = ymFace.getHeadpose();
-                boolean next = true;
-                if ((Math.abs(headposes[0]) > 30
-                        || Math.abs(headposes[1]) > 30
-                        || Math.abs(headposes[2]) > 30)) {
-                    next = false;
-                }
-                int faceQuality = faceTrack.getFaceQuality(0);
-                if (faceQuality < 6) {
-                    next = false;
-                }
-                if (next) { // 保证一个较好的脸部的质量
-                    Log.e(TAG, " 识别时的脸部状态OK " + faceQuality);
 
-                    if (faceId > -1 && !userVisited.contains(faceId)) { // 认识的情况
-                        userVisited.add(faceId);
+                faceId = ymFace.getPersonId();
+                Log.e(TAG, "  faceId " + faceId);
+                boolean next = true;
+                if (next) {
+
+                    if (faceId > -1) { // 认识的情况
+                        if (userVisited.contains(faceId))// 已经包含直接跳出
+                            return;
                         String name = DrawUtil.getNameFromPersonId(faceId);
-                        Log.e(TAG, "人脸识别的 id号码 " + faces.get(0).getPersonId() + "可信度 " + faces.get(0).getConfidence() + "获取到的人名 " + name);
                         if (!TextUtils.isEmpty(name)) {
-                            sayOnce = false;
                             Log.e(TAG, "存储器中获得的性别 " + DrawUtil.getGenderFromPersonId(faceId));
                             if (ymFace.getGender() == 1) {
                                 TTSManager.TTS(CorpusConstants.SayHelloWords(CorpusConstants.VIP_SIR, name), null);
@@ -285,6 +280,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                             } else {
                                 TTSManager.TTS(CorpusConstants.SayHelloWords(CorpusConstants.NO_SEX_VIP, name), null);
                             }
+                            userVisited.add(faceId);
                             // 子线程中处理
                             new Thread(new Runnable() {
                                 @Override
@@ -292,7 +288,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                                     // 添加数据库
                                     Log.e(TAG, "开始更新数据库 ");
                                     UserDataSupport dataSource = UserDataSupport.getInstance(FaceDetectService.this);
-                                    dataSource.updateIdentifyCount(faces.get(0).getPersonId() + "");
+                                    dataSource.updateIdentifyCount(ymFace.getPersonId() + "");
                                     Log.e(TAG, "更新数据库完成 ");
                                 }
                             }).start();
@@ -303,10 +299,10 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                         }
                     } else { // 不认识的情况
                         faceCheckCount++;
-                        Log.e(TAG, "不认识的人脸 faceId " + faceId + " faceCheckCount " + faceCheckCount);
-                        if (faceCheckCount == FACE_CHECK_COUNT && sayOnce) {
-                            sayOnce = false;
-                            Log.e(TAG, "性别 " + faces.get(0).getGender() + "track sex" + faceTrack.getGender(0));
+                        Log.e(TAG, "不认识的人脸 faceId " + faceId + " faceCheckCount " + faceCheckCount + " 长度 " + userVisited.size() + "是否包含faceId " + userVisited.contains(faceId));
+                        if (faceCheckCount >= FACE_CHECK_COUNT && !isStrangerVisited(ymFace.getAus())) {
+                            faceCheckCount = 0;
+                            userStrangerVisited.add(ymFace.getAus());
                             if (ymFace.getGenderConfidence() > 70) {
                                 if (ymFace.getGender() == 1) {
                                     TTSManager.TTS(CorpusConstants.SayHelloWords(CorpusConstants.SIR, null), null);
@@ -320,21 +316,6 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                     }
                 }
             }
-        } else {
-            noFaceTime = new Date().getTime();
-            Log.e(TAG, "没有检测到人脸 noFaceTime " + (noFaceTime - withFaceTime));
-            //长时间没有看到人脸，感觉没有人了
-            if ((noFaceTime - withFaceTime) > LONG_TIME_NO_FACE_THRESHOLD && (noFaceTime - withFaceTime) < LONG_TIME_NO_FACE_THRESHOLD * 24) {  // 没有人脸已经很久
-                Intent intent = new Intent(this, PirPersonDetectService.class);
-                intent.putExtra("startType", "noFace");
-                startService(intent);
-                HeadHelper.headCenter(this);
-                userVisited.clear();
-                trackingMap.clear();
-                TTSManager.TTS("很高兴为你服务，下次再见", null);
-                cameraHelper.stop();
-                stopTrack();
-            }
         }
     }
 
@@ -342,18 +323,25 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     private Thread thread;
     boolean threadBusy = false;
 
-    private int speedUpLength = 60;
-    protected List<YMFace> trackAnalyse(final byte[] bytes, final int iw, final int ih) {
+    public static int speedUpLength = 60;
 
-        if (faceTrack == null) return null;
+    protected void trackAnalyse(final byte[] bytes, final int iw, final int ih) {
+
+        if (faceTrack == null) return;
         final List<YMFace> faces = faceTrack.trackMulti(bytes, iw, ih);
 
-
         if (faces != null && faces.size() > 0) {
+            Log.e(TAG, "检测到人脸 ");
+            withFaceTime = new Date().getTime();
             if (!stop) {
                 if (trackingMap.size() > 50) trackingMap.clear();
                 //只对最大人脸框进行识别
                 int maxIndex = 0;
+                for (int i = 1; i < faces.size(); i++) {
+                    if (faces.get(maxIndex).getRect()[2] <= faces.get(i).getRect()[2]) {
+                        maxIndex = i;
+                    }
+                }
                 final YMFace ymFace = faces.get(maxIndex);
                 final int anaIndex = maxIndex;
                 final float[] rect = ymFace.getRect();
@@ -361,18 +349,19 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
 
                 //    此逻辑不利于判断，由于测距本身不准且旁边的没有相应的测距传感器
                 if (isTrackOn) { // 跟随运动逻辑
+                    CommonUtils.serviceToast(this, "trackId " + ymFace.getTrackId());
                     trackCenterX = (rect[0] - rect[2] / 2);
                     trackCenterY = (rect[1] + rect[3] / 2);
                     if (trackCenterX > TRACK_LEFT) {
-                        if (trackCenterX > TRACK_LEFT+speedUpLength){
+                        if (trackCenterX > TRACK_LEFT + speedUpLength) {
                             HeadHelper.headRightH(this);
-                        }else {
+                        } else {
                             HeadHelper.headRightL(this);
                         }
                     } else if (trackCenterX < TRACK_RIGHT) {
-                        if (trackCenterX < TRACK_RIGHT-speedUpLength){
+                        if (trackCenterX < TRACK_RIGHT - speedUpLength) {
                             HeadHelper.headLeftH(this);
-                        }else {
+                        } else {
                             HeadHelper.headLeftL(this);
                         }
 
@@ -391,8 +380,6 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                         public void run() {
                             try {
                                 threadBusy = true;
-                                final byte[] yuvData = new byte[bytes.length];
-                                System.arraycopy(bytes, 0, yuvData, 0, bytes.length);
                                 boolean next = true;
                                 if ((Math.abs(headposes[0]) > 30
                                         || Math.abs(headposes[1]) > 30
@@ -401,6 +388,10 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                                 }
                                 int faceQuality = faceTrack.getFaceQuality(anaIndex);
                                 if (faceQuality < 6) {
+                                    next = false;
+                                }
+                                int genderConfidence = faceTrack.getGenderConfidence(anaIndex);
+                                if (genderConfidence<80){
                                     next = false;
                                 }
                                 if (next) {
@@ -413,10 +404,18 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                                             ymFace.setPersonId(faceTrack.identifyPerson(anaIndex));
                                             ymFace.setGender(faceTrack.getGender(anaIndex));
                                             ymFace.setGenderConfidence(genderConfidenceRate);
+                                            ymFace.setAUs(faceTrack.getFaceFeature(anaIndex));
                                             trackingMap.put(trackId, ymFace);
                                         }
 
+                                    } else {
+                                        YMFace face = trackingMap.get(trackId);
+                                        ymFace.setPersonId(face.getPersonId());
+                                        ymFace.setGenderConfidence(face.getGenderConfidence());
+                                        ymFace.setGender(face.getGender());
+                                        ymFace.setAUs(face.getAus());
                                     }
+                                    recognizerLogic(ymFace); // 识别逻辑
                                 }
 
                             } catch (Exception e) {
@@ -431,19 +430,23 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
 
             }
 
-            for (int i = 0; i < faces.size(); i++) {
-                final YMFace ymFace = faces.get(i);
-                final int trackId = ymFace.getTrackId();
-                if (trackingMap.containsKey(trackId)) {
-                    YMFace face = trackingMap.get(trackId);
-                    ymFace.setPersonId(face.getPersonId());
-                    ymFace.setGenderConfidence(face.getGenderConfidence());
-                    ymFace.setGender(face.getGender());
-                    Log.e(TAG, "性别置信度 " + ymFace.getGenderConfidence());
-                }
+        } else { // 没有人脸的情况
+            noFaceTime = new Date().getTime();
+            Log.e(TAG, "没有检测到人脸 noFaceTime " + (noFaceTime - withFaceTime));
+            //长时间没有看到人脸，感觉没有人了
+            if ((noFaceTime - withFaceTime) > LONG_TIME_NO_FACE_THRESHOLD && (noFaceTime - withFaceTime) < LONG_TIME_NO_FACE_THRESHOLD * 24) {  // 没有人脸已经很久
+                Intent intent = new Intent(this, PirPersonDetectService.class);
+                intent.putExtra("startType", "noFace");
+                startService(intent);
+                HeadHelper.headCenter(this);
+                userVisited.clear();
+                userStrangerVisited.clear();
+                trackingMap.clear();
+                TTSManager.TTS("很高兴为你服务，下次再见", null);
+                cameraHelper.stop();
+                stopTrack();
             }
         }
-        return faces;
     }
 
     public void blockBack(String backMsg) {
@@ -464,25 +467,47 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         startService(intent);
     }
 
-    // 跟随距离
-    private QueryUltrasonicControl mQueryUltraValueControl = new QueryUltrasonicControl();
-    int ultraDistance = PirPersonDetectService.LOW_DISTANCE - 10;
-    private SendResponseListener mSendUltraResponseListener = new SendResponseListener<Ultrasonic>() {
-        @Override
-        public void onSuccess(Ultrasonic ultrasonic) {
-            if (ultrasonic != null) {
-                if (ultrasonic.getDistances()[5]>ultrasonic.getDistances()[6]){
-                    ultraDistance = ultrasonic.getDistances()[5];  // 逻辑值
-                }else {
-                    ultraDistance = ultrasonic.getDistances()[6];
+//    // 跟随距离
+//    private QueryUltrasonicControl mQueryUltraValueControl = new QueryUltrasonicControl();
+//    int ultraDistance = PirPersonDetectService.LOW_DISTANCE - 10;
+//    private SendResponseListener mSendUltraResponseListener = new SendResponseListener<Ultrasonic>() {
+//        @Override
+//        public void onSuccess(Ultrasonic ultrasonic) {
+//            if (ultrasonic != null) {
+//                if (ultrasonic.getDistances()[5] > ultrasonic.getDistances()[6]) {
+//                    ultraDistance = ultrasonic.getDistances()[5];  // 逻辑值
+//                } else {
+//                    ultraDistance = ultrasonic.getDistances()[6];
+//                }
+//                Log.e(TAG, "当前检测到的人脸检测中的距离 " + ultraDistance);
+//            }
+//        }
+//
+//        @Override
+//        public void onFail(int i, String s) {
+//
+//        }
+//    };
+
+
+    // 是否陌生人访问过默认false；
+    private boolean isStrangerVisited(float[] strangerFeature) {
+        boolean ret = false;
+        if (strangerFeature != null) {
+            if (userStrangerVisited.size() > 10)
+                userStrangerVisited.clear();
+            for (int i = 0; i < userStrangerVisited.size(); i++) {
+                float result = faceTrack.compareFaceFeature(strangerFeature, userStrangerVisited.get(i));
+                Log.e(TAG, i + " 个脸的比较结果 " + result + " 长度 " + userStrangerVisited.size());
+                if (result > 65) {
+                    ret = true;
+                    break;
                 }
-                Log.e(TAG, "当前检测到的人脸检测中的距离 " + ultraDistance);
             }
+            Log.e(TAG, " 比较人脸结果 " + ret);
+        } else {
+            ret = true;
         }
-
-        @Override
-        public void onFail(int i, String s) {
-
-        }
-    };
+        return ret;
+    }
 }
