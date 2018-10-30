@@ -40,7 +40,7 @@ public class PirPersonDetectService extends Service {
                 isPersonOn = true;
 
 //                    if (isInDistance()) {
-                TTSManager.TTS("你好 ， 嘻嘻 ！", null);
+                TTSManager.TTS("你好，我是奥丁！", null);
                 Intent intent = new Intent(PirPersonDetectService.this, FaceDetectService.class);
                 intent.putExtra("startType", "active_interaction");
                 intent.putExtra("msg", "sayHello");

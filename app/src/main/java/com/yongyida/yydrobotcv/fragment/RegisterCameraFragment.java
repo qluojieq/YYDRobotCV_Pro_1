@@ -2,16 +2,7 @@ package com.yongyida.yydrobotcv.fragment;
 
 import android.app.Fragment;
 import android.content.Context;
-import android.content.res.Configuration;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Color;
-import android.graphics.Paint;
-import android.graphics.PixelFormat;
-import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
-import android.graphics.RectF;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.os.Handler;
@@ -24,20 +15,17 @@ import android.view.SurfaceView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yongyida.robot.brain.system.ITTSCallback;
 import com.yongyida.yydrobotcv.R;
 import com.yongyida.yydrobotcv.RegisterActivity;
 import com.yongyida.yydrobotcv.camera.ImageUtils;
 import com.yongyida.yydrobotcv.customview.ErrorDialog;
-import com.yongyida.yydrobotcv.customview.ExitDialog;
 import com.yongyida.yydrobotcv.customview.SameFaceWarnDialog;
 import com.yongyida.yydrobotcv.tts.TTSManager;
 import com.yongyida.yydrobotcv.useralbum.User;
 import com.yongyida.yydrobotcv.useralbum.UserDataSupport;
 import com.yongyida.yydrobotcv.utils.CommonUtils;
-
 
 import java.util.ArrayList;
 import java.util.List;
@@ -51,6 +39,7 @@ import dou.utils.DisplayUtil;
 import mobile.ReadFace.YMFace;
 import mobile.ReadFace.YMFaceTrack;
 
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
 import static dou.utils.HandleUtil.runOnUiThread;
 
 /**
@@ -133,6 +122,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
     boolean isSameFaceChecked = false;
     boolean isUpdateFace = false;
 
+
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, Bundle savedInstanceState) {
@@ -140,13 +130,15 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         View view = inflater.inflate(R.layout.enroll_camera_fragment, container, false);
         initCamera(view);
         registerUser = new User();
-        exitDialog = new ErrorDialog(getContext(), R.style.custom_dialog, new ErrorDialog.OnCloseListener() {
+        exitDialog = new ErrorDialog(RegisterCameraFragment.this.mContext, R.style.custom_dialog, new ErrorDialog.OnCloseListener() {
             @Override
             public void clickConfirm() {
                 exitDialog.dismiss();
                 RegisterCameraFragment.this.getActivity().finish();
             }
         });
+
+
         mHandler = new Handler(new Handler.Callback() {
             @Override
             public boolean handleMessage(Message msg) {
@@ -300,7 +292,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         faceTrack.setDistanceType(YMFaceTrack.DISTANCE_TYPE_NEAR);
 
 //        普通有效期版本初始化
-        int result = faceTrack.initTrack(this.getActivity(), YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640);
+        int result = faceTrack.initTrack(this.getActivity(), YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640,DATA_PATH);
 
         //设置人脸识别置信度，设置75，不允许修改
         faceTrack.setRecognitionConfidence(75);
@@ -333,27 +325,32 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
             if (id>0&&!isSameFaceChecked){
                 isSameFaceChecked = true;
                 Log.e(TAG,"checked ");
-                final User user =  UserDataSupport.getInstance(this.getContext()).getUser(id+"");
+                final User user =  UserDataSupport.getInstance(this.mContext).getUser(id+"");
                 if (user.getPhoneNum()!=null){
 
                     mCameraHelper.stopPreview();
-                    faceCheckDialog = new SameFaceWarnDialog(this.getContext(), R.style.custom_dialog, new SameFaceWarnDialog.OnCloseListener() {
+                    runOnUiThread(new Runnable() {
                         @Override
-                        public void clickConfirm() { // 更新
-                            Log.e(TAG,"更新头像");
-                            faceCheckDialog.dismiss();
-                            isUpdateFace = true;
-                            mCameraHelper.startPreview();
-                            personId = Integer.parseInt(user.getPersonId());
+                        public void run() {
+                            faceCheckDialog = new SameFaceWarnDialog(RegisterCameraFragment.this.mContext, R.style.custom_dialog, new SameFaceWarnDialog.OnCloseListener() {
+                                @Override
+                                public void clickConfirm() { // 更新
+                                    Log.e(TAG,"更新头像");
+                                    faceCheckDialog.dismiss();
+                                    isUpdateFace = true;
+                                    mCameraHelper.startPreview();
+                                    personId = Integer.parseInt(user.getPersonId());
+                                }
+                                @Override
+                                public void clickCancel() {  // 不做任何处理
+                                    Log.e(TAG,"新录入");
+                                    faceCheckDialog.dismiss();
+                                    mCameraHelper.startPreview();
+                                }
+                            }, "已识别你为"+ user.getUserName()+", " + user.getPhoneNum().substring(0,3) + " * * * " + user.getPhoneNum().substring(7,11));
+                            faceCheckDialog.show();
                         }
-                        @Override
-                        public void clickCancel() {  // 不做任何处理
-                            Log.e(TAG,"新录入");
-                            faceCheckDialog.dismiss();
-                            mCameraHelper.startPreview();
-                        }
-                    }, "已识别你为"+ user.getUserName()+", " + user.getPhoneNum().substring(0,3) + " * * * " + user.getPhoneNum().substring(7,11));
-                    faceCheckDialog.show();
+                    });
                 }
 
             }if(id == -111){
@@ -514,18 +511,22 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
         registerUser.setAge(faceTrack.getAge(0) + "");
         registerUser.setGender(faceTrack.getGender(0) + "");
         currentRegisterId = personId;
-        Log.e(TAG, "起始 年龄" + faceTrack.getAge(0) + "性别 " + faceTrack.getGender(0));
+        Log.e(TAG, "起始 年龄" + faceTrack.getAge(0) + "性别 " + faceTrack.getGender(0) + "personId " + personId);
 
         if (personId > 0) {
             registerUser.setPersonId(personId + "");
             Bitmap image = BitmapUtil.getBitmapFromYuvByte(bytes, iw, ih);
             Bitmap head = Bitmap.createBitmap(image, (int) rect[0], (int) rect[1],
                     (int) rect[2], (int) rect[3], null, true);
-            ImageUtils.saveBitmap(mContext.getCacheDir() + "/" + personId + ".jpg", head);
+            ImageUtils.saveBitmap(DATA_PATH + personId + ".jpg", head);
 
         } else {
-            DLog.d("添加人脸失败！");
-            Toast.makeText(mContext, "添加人脸失败！请重新添加", Toast.LENGTH_SHORT).show();
+            DLog.d("添加人脸失败！" + personId );
+            CommonUtils.serviceToast(mContext,"添加人脸失败！请重新添加" + personId);
+            Bitmap image = BitmapUtil.getBitmapFromYuvByte(bytes, iw, ih);
+            Bitmap head = Bitmap.createBitmap(image, (int) rect[0], (int) rect[1],
+                    (int) rect[2], (int) rect[3], null, true);
+            ImageUtils.saveBitmap(DATA_PATH + personId + "test.jpg", head);
         }
 
     }
@@ -545,7 +546,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
             Bitmap image = BitmapUtil.getBitmapFromYuvByte(bytes, iw, ih);
             Bitmap head = Bitmap.createBitmap(image, (int) rect[0], (int) rect[1],
                     (int) rect[2], (int) rect[3], null, true);
-            ImageUtils.saveBitmap(mContext.getCacheDir() + "/" + personId + ".jpg", head);
+            ImageUtils.saveBitmap(DATA_PATH  + personId + ".jpg", head);
 //            Toast.makeText(mContext, personId + " 更新人脸信息  " + id, Toast.LENGTH_SHORT).show();
             TTSManager.TTS("人脸更新成功",null);
             RegisterCameraFragment.this.getActivity().setResult(RegisterActivity.ADD_SUCCESS_RESULT_CODE);
@@ -569,6 +570,7 @@ public class RegisterCameraFragment extends Fragment implements CameraHelper.Pre
 
     @Override
     public void onDestroy() {//释放
+        mHandler.removeCallbacksAndMessages(null);
         super.onDestroy();
     }
 

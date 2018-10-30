@@ -14,6 +14,8 @@ import java.util.Map;
 
 import dou.utils.DLog;
 
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
+
 
 /**
  * Created by Brandon on 18/4/19.
@@ -32,10 +34,9 @@ public class DrawUtil {
         UserDataSupport dataSource =  UserDataSupport.getInstance(context);
         userMap.clear();
         userList.clear();
-        userList = dataSource.getAllUsers("");
+        userList = dataSource.getAllUsers();
         for (int i = 0; i < userList.size(); i++) {
-            String imgPath = context.getCacheDir()
-                    + "/" + userList.get(i).getPersonId() + ".jpg";
+            String imgPath = DATA_PATH + userList.get(i).getPersonId() + ".jpg";
             File imgFile = new File(imgPath);
             if (imgFile.exists()) {
                 userList.get(i).setHeadPortrait(imgPath);
@@ -52,7 +53,7 @@ public class DrawUtil {
             User user = userMap.get(personId);
             return user.getUserName();
         }
-        return "";
+        return "" + personId;
     }
 
     public static String getGenderFromPersonId(int personId) {

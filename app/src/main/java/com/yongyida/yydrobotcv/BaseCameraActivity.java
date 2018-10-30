@@ -27,6 +27,8 @@ import dou.utils.ToastUtil;
 import mobile.ReadFace.YMFace;
 import mobile.ReadFace.YMFaceTrack;
 
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
+
 /**
  * Created by mac on 16/7/13.
  */
@@ -120,7 +122,7 @@ public abstract class BaseCameraActivity extends BaseActivity implements CameraH
 //                SenseConfig.appid, SenseConfig.appsecret);
 //
 //        普通有效期版本初始化
-        int result = faceTrack.initTrack(this, YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640);
+        int result = faceTrack.initTrack(this, YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640,DATA_PATH);
 
         //设置人脸识别置信度，设置75，不允许修改
 

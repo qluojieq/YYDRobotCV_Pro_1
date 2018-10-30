@@ -23,6 +23,8 @@ import com.yongyida.yydrobotcv.useralbum.UserDataSupport;
 
 import java.io.File;
 
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
+
 public class BaseInfoShowActivity extends AppCompatActivity {
 
     private final String TAG = BaseInfoShowActivity.class.getSimpleName();
@@ -68,7 +70,7 @@ public class BaseInfoShowActivity extends AppCompatActivity {
         //圆形的头像
 
 
-        File avaterFile = new File(this.getCacheDir() + "/" + user.getPersonId() + ".jpg");
+        File avaterFile = new File(DATA_PATH  + user.getPersonId() + ".jpg");
         if (avaterFile.exists()) {
             bigMap = BitmapFactory.decodeFile(avaterFile.getAbsolutePath());
         } else {

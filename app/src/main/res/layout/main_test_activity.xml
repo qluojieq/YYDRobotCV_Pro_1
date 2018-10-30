@@ -4,15 +4,80 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
     <Button
-        android:text="开始猜拳游戏"
+        android:text="工厂模式跟踪"
         android:onClick="startFFGame"
         android:layout_width="match_parent"
         android:layout_height="@dimen/test_btn_height" />
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="@dimen/test_btn_height">
+    <TextView
+        android:text="宽度_"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"  />
+    <EditText
+        android:inputType="number"
+        android:id="@+id/test_w"
+        android:text="540"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+    <TextView
+        android:text="高度_"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"  />
+    <EditText
+        android:inputType="number"
+        android:id="@+id/test_h"
+        android:text="360"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <TextView
+        android:text="转速"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"  />
+    <EditText
+        android:inputType="number"
+        android:id="@+id/test_s"
+        android:text="10"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+    <TextView
+        android:text="步长"
+        android:gravity="center"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"  />
+    <EditText
+        android:inputType="number"
+        android:id="@+id/test_l"
+        android:text="5"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
     <Button
-        android:text="开始眉毛游戏"
-        android:onClick="startEBGame"
-        android:layout_width="match_parent"
-        android:layout_height="@dimen/test_btn_height" />
+        android:onClick="setProperty"
+        android:text="O"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+
+    <Button
+        android:onClick="resetProperty"
+        android:text="R"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="match_parent" />
+</LinearLayout>
     <Button
         android:text="注册人脸"
         android:onClick="startPersonRegist"

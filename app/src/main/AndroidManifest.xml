@@ -59,7 +59,8 @@
             android:exported="true" />
 
         <activity
-            android:name=".FaceTrackActivity"
+            android:name="com.yongyida.yydrobotcv.FaceTrackActivity"
+            android:exported="true"
             android:launchMode="singleTask">
             <!--<intent-filter>-->
                 <!--<action android:name="android.intent.action.MAIN" />-->

@@ -73,6 +73,33 @@ public class UserDataSupport extends ContentProvider {
 
 
 
+    // 全部用户关键信息，主要时姓名
+    public List<User> getAllUsers() {
+        open();
+        List<User> allUsers = new ArrayList<>();
+        Cursor cursor = database.query(UserDataHelper.DATABASE_TABLE, allColumns, null, null, null, null, null);
+        cursor.moveToFirst();
+        while (!cursor.isAfterLast()) {
+            User user = new User();
+            user.setUserId(cursor.getString(0));
+            user.setPersonId(cursor.getString(1));
+            user.setUserName(cursor.getString(2));
+            user.setBirthDay(cursor.getString(3));
+            user.setGender(cursor.getString(4));
+            user.setPhoneNum(cursor.getString(5));
+            user.setVipRate(cursor.getString(6));
+            user.setHeadPortrait(cursor.getString(7));
+            user.setIdentifyCount(cursor.getString(8));
+            user.setTag(cursor.getString(9));
+            allUsers.add(user);
+            cursor.moveToNext();
+        }
+        Log.e(TAG,allUsers.size() + " get all user success " + cursor.getCount());
+        cursor.close();
+        close();
+        return allUsers;
+    }
+
     //获取全部用户
     public List<User> getAllUsers(String type) {
         open();

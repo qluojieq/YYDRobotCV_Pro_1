@@ -35,6 +35,8 @@ import dou.utils.ToastUtil;
 import mobile.ReadFace.YMFace;
 import mobile.ReadFace.YMFaceTrack;
 
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
+
 public class FaceDetectService extends Service implements CameraHelper.PreviewListener {
     private static final String TAG = FaceDetectService.class.getSimpleName();
 
@@ -51,14 +53,19 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     public static final String START_TAG = "tag"; //
 
     // 跟随限定参数
-    public static final int TRACK_RANGE_HEIGHT = 360;
-    public static final int TRACK_RANGE_WIDTH = 320; // 720过大
+    public static  int TRACK_RANGE_HEIGHT = 360;
+    public static  int TRACK_RANGE_WIDTH = 520; // 720过大 中间冗差角度
     //跟随的上下限
-    public  static final int TRACK_TOP = (CameraBase.HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
-    public  static final int TRACK_BOTTOM = CameraBase.HEIGHT_PREVIEW - TRACK_TOP;
+    public  static  int TRACK_TOP = (CameraBase.HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
+    public  static  int TRACK_BOTTOM = CameraBase.HEIGHT_PREVIEW - TRACK_TOP;
     // 跟随的左右限制
-    public static final int TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
-    public  static final int TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
+    public static  int TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
+    public  static  int TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
+
+    public static void updateOffset(){
+       TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
+        TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
+    }
 
     public  static float trackCenterX = 640;
     public static float trackCenterY = 360;
@@ -220,7 +227,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         mContext = this;
         faceTrack = new YMFaceTrack();
         faceTrack.setDistanceType(YMFaceTrack.DISTANCE_TYPE_FAR);
-        int result = faceTrack.initTrack(this, YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640);
+        int result = faceTrack.initTrack(this, YMFaceTrack.FACE_0, YMFaceTrack.RESIZE_WIDTH_640,DATA_PATH);
         DLog.d("getAlbumSize1: " + faceTrack.getEnrolledPersonIds().size());
 
         boolean needUpdateFaceFeature = faceTrack.isNeedUpdateFaceFeature();
@@ -350,6 +357,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
                 //    此逻辑不利于判断，由于测距本身不准且旁边的没有相应的测距传感器
                 if (isTrackOn) { // 跟随运动逻辑
                     CommonUtils.serviceToast(this, "trackId " + ymFace.getTrackId());
+                    Log.e(TAG,"");
                     trackCenterX = (rect[0] - rect[2] / 2);
                     trackCenterY = (rect[1] + rect[3] / 2);
                     if (trackCenterX > TRACK_LEFT) {

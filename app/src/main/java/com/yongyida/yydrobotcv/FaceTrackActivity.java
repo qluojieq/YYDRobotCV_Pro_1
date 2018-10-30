@@ -13,6 +13,7 @@ import com.yongyida.yydrobotcv.camera.CameraBase;
 import com.yongyida.yydrobotcv.motion.HeadHelper;
 import com.yongyida.yydrobotcv.service.PersonDetectService;
 import com.yongyida.yydrobotcv.utils.CommonUtils;
+import com.yongyida.yydrobotcv.utils.DrawUtil;
 import com.yongyida.yydrobotcv.utils.TrackUtil;
 
 import java.util.List;
@@ -25,7 +26,7 @@ import static com.yongyida.yydrobotcv.motion.HeadHelper.linkedRight;
 
 
 /**
- * Created by mac on 16/7/4.
+ * Created by Brandon on 18/7/4.
  */
 public class FaceTrackActivity extends BaseCameraActivity {
 
@@ -51,6 +52,7 @@ public class FaceTrackActivity extends BaseCameraActivity {
         showFps(true);
         totalCount = 0;
         trackingMap = new SimpleArrayMap<>();
+        DrawUtil.updateDataSource(this);
 //        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 0);
     }
 
@@ -147,7 +149,7 @@ public class FaceTrackActivity extends BaseCameraActivity {
                                         DLog.d(gender + " ：" + gender_confidence);
                                         if (gender_confidence >= 90) {
                                             ymFace.setAge(faceTrack.getAge(anaIndex));
-                                            ymFace.setPersonId(faceTrack.getFaceQuality(anaIndex));
+                                            ymFace.setPersonId(faceTrack.identifyPerson(anaIndex));
                                             ymFace.setGender(gender);
                                             trackingMap.put(trackId, ymFace);
                                         }

@@ -8,7 +8,11 @@ import android.util.Log;
 import com.squareup.leakcanary.LeakCanary;
 import com.yongyida.yydrobotcv.tts.TTSManager;
 
+import java.io.File;
+
 import mobile.ReadFace.YMUtil;
+
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
 
 
 /**
@@ -43,6 +47,11 @@ public class BaseApplication extends Application {
             // This process is dedicated to LeakCanary for heap analysis.
             // You should not init your app in this process.
             return;
+        }
+        File file = new File(DATA_PATH);
+        if (!file.exists()){
+            file.mkdirs();
+            Log.e(TAG,"创建文件路径成功");
         }
         LeakCanary.install(this);
     }

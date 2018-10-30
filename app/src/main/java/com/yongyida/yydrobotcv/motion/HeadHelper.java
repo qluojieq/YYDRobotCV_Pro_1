@@ -25,17 +25,24 @@ public class HeadHelper {
     private static SoundLocationControl mSoundLocationControl = new SoundLocationControl();
 
 
-    public static int stepLRH = 8; //默认 12
-    public static int stepLRL= 8; //默认 12
+    public static int stepLRH = 5; //  步长
+    public static int stepLRL= stepLRH;
 
-    public static int stepUD = 10;
+    public static int stepLRLinkFood= 7;
 
+    public static int stepUD = 10; // 速度
+    public static int stepSpeed = stepUD;
+
+    public static void updateSL(){
+        stepSpeed = stepUD;
+        stepLRL= stepLRH;
+    }
     //  头脚联动
     public static void linkedLeft(Context context){
         Log.e(TAG,"头脚联动  左");
         mSoundLocationControl.setMode(SoundLocationControl.Mode.HEAD_FOOT);
         mSoundLocationControl.setType(REQUEST);
-        mSoundLocationControl.setAngle(8);
+        mSoundLocationControl.setAngle(stepLRLinkFood);
         SendClient.getInstance(context).send(null, mSoundLocationControl, null);
     }
 
@@ -44,7 +51,7 @@ public class HeadHelper {
         Log.e(TAG,"头脚联动  右");
         mSoundLocationControl.setMode(SoundLocationControl.Mode.HEAD_FOOT);
         mSoundLocationControl.setType(REQUEST);
-        mSoundLocationControl.setAngle(352);
+        mSoundLocationControl.setAngle(360-stepLRLinkFood);
         SendClient.getInstance(context).send(null, mSoundLocationControl, null);
     }
 
@@ -56,7 +63,7 @@ public class HeadHelper {
         mHeadLeftRight.getDistance().setUnit(SteeringControl.Distance.Unit.PERCENT);
         mHeadLeftRight.getDistance().setValue(stepLRL);
         mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
-        mHeadLeftRight.getSpeed().setValue(68);
+        mHeadLeftRight.getSpeed().setValue(stepSpeed);
         SendClient.getInstance(context).send(null, mHeadControl, null);
     }
 
@@ -68,7 +75,7 @@ public class HeadHelper {
         mHeadLeftRight.getDistance().setUnit(SteeringControl.Distance.Unit.PERCENT);
         mHeadLeftRight.getDistance().setValue(stepLRH);
         mHeadLeftRight.getSpeed().setUnit(SteeringControl.Speed.Unit.PERCENT);
-        mHeadLeftRight.getSpeed().setValue(68);
+        mHeadLeftRight.getSpeed().setValue(stepSpeed);
         SendClient.getInstance(context).send(null, mHeadControl, null);
     }
 
@@ -125,7 +132,8 @@ public class HeadHelper {
     public static void headLeftH(Context context) {
         mHeadLeftRight.setNegative(true);
         initLRheadH(context);
-        Log.e(TAG, "headLeft");
+        Log.e(TAG, "headLeft" + stepSpeed);
+        Log.e(TAG, "speed " + stepSpeed + " offset " + stepLRH);
     }
 
     public static void headRightH(Context context) {
@@ -170,6 +178,9 @@ public class HeadHelper {
     public static void headCenter(Context context){
         mHeadControl.setAction(HeadControl.Action.LEFT_RIGHT);
         mHeadLeftRight.setMode(SteeringControl.Mode.RESET);
+        SendClient.getInstance(context).send(null,mHeadControl,null);
+        mHeadControl.setAction(HeadControl.Action.UP_DOWN);
+        mHeadUpDown.setMode(SteeringControl.Mode.RESET);
         SendClient.getInstance(context).send(null,mHeadControl,null);
     }
 }

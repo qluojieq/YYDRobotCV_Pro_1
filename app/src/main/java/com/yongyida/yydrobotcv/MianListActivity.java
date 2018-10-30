@@ -46,6 +46,7 @@ import java.util.Random;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_DRAGGING;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_IDLE;
 import static android.support.v7.widget.RecyclerView.SCROLL_STATE_SETTLING;
+import static com.yongyida.yydrobotcv.useralbum.UserDataHelper.DATA_PATH;
 
 /**
  * @author Brandon on 2018/3/13
@@ -56,11 +57,11 @@ public class MianListActivity extends AppCompatActivity implements OnRequestPerm
     private static final int NEW_ADD_REQUEST = 11;
     public static final String TAG = MianListActivity.class.getSimpleName();
 
-    UserDataSupport dataSupport;
+    public static UserDataSupport dataSupport;
     // Used to load the 'native-lib' library on application startup.
     public static List<User> usersData;
 
-    public static Handler mHandler;
+//    public static Handler mHandler;
 
     RecyclerView userRecycleView;
     UsersAdapter userDataAdapter;
@@ -70,12 +71,12 @@ public class MianListActivity extends AppCompatActivity implements OnRequestPerm
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mHandler = new Handler(new Handler.Callback() {
-            @Override
-            public boolean handleMessage(Message msg) {
-                return false;
-            }
-        });
+//        mHandler = new Handler(new Handler.Callback() {
+//            @Override
+//            public boolean handleMessage(Message msg) {
+//                return false;
+//            }
+//        });
         setContentView(R.layout.main_activity);
         dataSupport = UserDataSupport.getInstance(this);
         userRecycleView = (RecyclerView) findViewById(R.id.user_recycle);
@@ -212,7 +213,7 @@ public class MianListActivity extends AppCompatActivity implements OnRequestPerm
             } else {
 
                 try {
-                    File avaterFile = new File(mContext.getCacheDir() + "/" + usersData.get(position).getPersonId() + ".jpg");
+                    File avaterFile = new File(DATA_PATH  + usersData.get(position).getPersonId() + ".jpg");
                     if (avaterFile.exists()) {
                         bigMap = BitmapFactory.decodeFile(avaterFile.getAbsolutePath());
                         RoundedBitmapDrawable roundedBitmapDrawable = RoundedBitmapDrawableFactory.create(mContext.getResources(), bigMap);
@@ -296,7 +297,7 @@ public class MianListActivity extends AppCompatActivity implements OnRequestPerm
         Log.e(TAG, "点击到啊字母 " + targetChar + "首次出现该字母的位置 " + ret);
         isOver = false;
         if (usersData.size() > 9 && i > usersData.size() - 10) {
-            mHandler.sendEmptyMessage(usersData.size() - 10);
+//            mHandler.sendEmptyMessage(usersData.size() - 10);
             Log.e(TAG, "超出滑动范围 " + usersData.get(usersData.size() - 10).getUserName());
             isOver = true;
             if (usersData.size() / 2 == 0) {
@@ -430,5 +431,12 @@ public class MianListActivity extends AppCompatActivity implements OnRequestPerm
         Collections.sort(indexLetter);
         Log.e(TAG, "indexLetter length " + indexLetter.size());
         return allUsers;
+    }
+
+    @Override
+    protected void onDestroy() {
+//        mHandler.removeCallbacksAndMessages(null);
+        super.onDestroy();
+
     }
 }

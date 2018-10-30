@@ -212,7 +212,7 @@ public class TrackUtil {
 //                    sb.append(ymFace.getGender() == 0 ? "F " : "");
                     sb.append( "颜值"+ymFace.getBeautyScore());
                     sb.append("/");
-                    sb.append( "统计值"+ymFace.getFaceQuality());
+                    sb.append( "姓名 "+  DrawUtil.getNameFromPersonId(ymFace.getPersonId()));
 //                    sb.append("/");
 //                    if (ymFace.getGender()==1){
 //                        sb.append( arrayMapMale.get(ymFace.getPersonId()-1).name);
@@ -258,7 +258,7 @@ public class TrackUtil {
                     paint.getTextBounds(sb.toString(), 0, sb.toString().length(), rect_text);
                     paint.setColor(Color.rgb(250, 0, 0));
                     //写文字
-//                    canvas.drawText(sb.toString()/*+"  width："+rect_width*/, x1-rect_width, y1 + rect_width, paint);
+                    canvas.drawText(sb.toString()/*+"  width："+rect_width*/, x1-rect_width, y1 + rect_width, paint);
 
                     //变换
                     android.graphics.Camera camera;
