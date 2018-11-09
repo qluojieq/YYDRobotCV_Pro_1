@@ -65,6 +65,9 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
     public static void updateOffset(){
        TRACK_RIGHT = (CameraBase.WIDTH_PREVIEW - TRACK_RANGE_WIDTH) / 2;
         TRACK_LEFT = CameraBase.WIDTH_PREVIEW - TRACK_RIGHT;
+
+        TRACK_TOP = (CameraBase.HEIGHT_PREVIEW - TRACK_RANGE_HEIGHT) / 2;
+        TRACK_BOTTOM = CameraBase.HEIGHT_PREVIEW - TRACK_TOP;
     }
 
     public  static float trackCenterX = 640;

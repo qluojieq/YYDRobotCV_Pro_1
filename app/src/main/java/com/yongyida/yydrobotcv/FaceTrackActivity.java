@@ -85,6 +85,7 @@ public class FaceTrackActivity extends BaseCameraActivity {
     public  static float trackCenterX = 960;
     public static float trackCenterY = 540;
     public static int speedUpLength = 60;
+    long last = 0;
     @Override
     protected List<YMFace> analyse(byte[] bytes, final int iw, final int ih) {
 

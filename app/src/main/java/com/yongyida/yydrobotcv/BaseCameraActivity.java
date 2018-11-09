@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 import com.yongyida.yydrobotcv.readface.BaseActivity;
 import com.yongyida.yydrobotcv.readface.BaseApplication;
+import com.yongyida.yydrobotcv.utils.CommonUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -59,8 +60,8 @@ public abstract class BaseCameraActivity extends BaseActivity implements CameraH
         params.firstCameraId = Camera.CameraInfo.CAMERA_FACING_BACK;
         params.surfaceView = camera_view;
         params.preview_width = camera_max_width;
-        params.preview_width = 1920;
-        params.preview_height = 1080;
+        params.preview_width = 1280;
+        params.preview_height = 720;
 
         params.camera_ori = 0;
         params.camera_ori_front = 0;
@@ -182,6 +183,7 @@ public abstract class BaseCameraActivity extends BaseActivity implements CameraH
     @Override
     public void onPreviewFrame(byte[] bytes, Camera camera) {
         if (camera_long == 0) camera_long = System.currentTimeMillis();
+        CommonUtils.serviceToast(this,"" + camera_fps);
         camera_count++;
         if (System.currentTimeMillis() - camera_long > 1000) {
             camera_fps = camera_count;
