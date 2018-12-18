@@ -4,11 +4,16 @@
     android:layout_height="match_parent">
 
 
+
     <include
         layout="@layout/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true" />
-
+    <Button
+        android:onClick="startMainActivity"
+        android:text="启动主界面"
+        android:layout_width="100dp"
+        android:layout_height="45dp" />
 </RelativeLayout>

@@ -53,7 +53,7 @@ public class DrawUtil {
             User user = userMap.get(personId);
             return user.getUserName();
         }
-        return "" + personId;
+        return "";
     }
 
     public static String getGenderFromPersonId(int personId) {

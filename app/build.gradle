@@ -1,16 +1,16 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 26
     defaultConfig {
         applicationId "com.yongyida.yydrobotcv"
-        minSdkVersion 21
-        targetSdkVersion 28
+        minSdkVersion 22
+        targetSdkVersion 22
         versionCode 1
-        versionName "v1.18.1030"
+        versionName "v1.18.1127"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         ndk {
-            abiFilters( "armeabi-v7a")
+            abiFilters("armeabi-v7a")
         }
     }
     buildTypes {
@@ -19,20 +19,20 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    sourceSets{
-        main{
-            jniLibs.srcDirs =['libs']
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['libs']
         }
     }
 }
-repositories{
+repositories {
     flatDir {
         dirs 'libs'
     }
 }
 dependencies {
     implementation fileTree(include: ['*.jar'], dir: 'libs')
-    implementation 'com.android.support:appcompat-v7:28.0.0-rc02'
+    implementation 'com.android.support:appcompat-v7:26.0.0'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
@@ -47,11 +47,12 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.2.4'
     implementation files('libs/OrbbecSDK_v1.1.4_170224_pro.jar')
     implementation files('libs/pinyin4j-2.5.0.jar')
-    implementation 'com.android.support:recyclerview-v7:28.0.0-rc02'
+    implementation 'com.android.support:recyclerview-v7:26.0.0'
     // 内存泄漏问题
     debugImplementation 'com.squareup.leakcanary:leakcanary-android:1.6.1'
     releaseImplementation 'com.squareup.leakcanary:leakcanary-android-no-op:1.6.1'
     // Optional, if you use support library fragments:
     debugImplementation 'com.squareup.leakcanary:leakcanary-support-fragment:1.6.1'
     implementation files('libs/brandonlib.jar')
+    implementation 'com.squareup.okhttp3:okhttp:3.11.0'
 }

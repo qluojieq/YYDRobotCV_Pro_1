@@ -15,6 +15,7 @@ import com.yongyida.yydrobotcv.service.PersonDetectService;
 import com.yongyida.yydrobotcv.utils.CommonUtils;
 import com.yongyida.yydrobotcv.utils.DrawUtil;
 import com.yongyida.yydrobotcv.utils.TrackUtil;
+import com.yyd.yydrobotcv.activity.PersonListActivity;
 
 import java.util.List;
 
@@ -206,4 +207,9 @@ public class FaceTrackActivity extends BaseCameraActivity {
         return  name;
     }
 
+    public void startMainActivity(View view) {
+        Intent intent = new Intent(this, PersonListActivity.class);
+
+        startActivity(intent);
+    }
 }

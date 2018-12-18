@@ -221,7 +221,7 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         DLog.d("release track success");
     }
 
-    public void initFaceTrack() {
+    public void  initFaceTrack() {
         if (faceTrack != null) {
             DLog.d("already init track");
             return;
@@ -243,7 +243,6 @@ public class FaceDetectService extends Service implements CameraHelper.PreviewLi
         } else {
             new ToastUtil(this).showSingletonToast("初始化检测器失败");
         }
-
         DLog.d("getAlbumSize2 :" + faceTrack.getEnrolledPersonIds().size());
     }
 

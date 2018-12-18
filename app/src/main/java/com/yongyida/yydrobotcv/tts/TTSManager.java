@@ -56,6 +56,17 @@ public class TTSManager {
             e.printStackTrace();
         }
     }
+    public static void TTS(Context context,String msg, ITTSCallback callback){
+        Log.e(TAG,"speak" + msg);
+        try {
+            TTSSTop(context);
+            if (TTSControl!=null){
+                TTSControl.startTTS(msg,null ,callback);
+            }
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+    }
     public static void TTSSTop(Context context){
         Log.e(TAG,"stop  speak");
         try {

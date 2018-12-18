@@ -255,6 +255,9 @@ public class UserDataSupport extends ContentProvider {
         Log.e(TAG,"更新访问次数 开始");
         open();
         Cursor lastCursor = database.query(UserDataHelper.DATABASE_TABLE, new String[]{UserDataHelper.C_UIC}, UserDataHelper.C_ID_PERSON + "= ?", new String[] {personId}, null, null, null);
+        if (lastCursor.getCount()<1){
+            return  -1;
+        }
         lastCursor.moveToFirst();
         String temp = lastCursor.getString(0);
         Log.e(TAG,"更新访问次数 返回cursor" + temp);

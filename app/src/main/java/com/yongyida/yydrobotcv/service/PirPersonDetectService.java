@@ -63,24 +63,26 @@ public class PirPersonDetectService extends Service {
         return null;
     }
 
+
     @Override
     public void onCreate() {
         super.onCreate();
+        Log.e(TAG, " pir人体检测开启成功 ");
+        TTSManager.TTS("红外人体检测开启成功！", null);
     }
-
+    String startType;
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent!=null){
-            String startType = intent.getStringExtra("startType");
+            startType = intent.getStringExtra("startType");
+            Log.e(TAG,"start Type " + startType);
             if (startType != null && startType.equals("noFace")) {
                 isPersonOn = false;
             }else {
                 isPersonOn = false;
                 SendClient.getInstance(this).send(this, mQueryPirValueControl, mSendPirResponseListener);
                 mQueryUltraValueControl.setAndroid(QueryUltrasonicControl.Android.SEND);
-                Log.e(TAG, " pir人体检测开启成功 ");
-                TTSManager.TTS("红外人体检测开启成功！", null);
             }
         }
 

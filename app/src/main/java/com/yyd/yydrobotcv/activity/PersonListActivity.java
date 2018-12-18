@@ -3,6 +3,7 @@ package com.yyd.yydrobotcv.activity;
 import android.Manifest;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Application;
 import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.ComponentName;
@@ -28,6 +29,7 @@ import android.widget.Toast;
 import com.yongyida.yydrobotcv.FaceTrackActivity;
 import com.yongyida.yydrobotcv.MianListActivity;
 import com.yongyida.yydrobotcv.R;
+
 import com.yongyida.yydrobotcv.motion.HeadHelper;
 import com.yongyida.yydrobotcv.service.FaceDetectService;
 import com.yongyida.yydrobotcv.utils.CommonUtils;
@@ -114,11 +116,19 @@ public class PersonListActivity extends AppCompatActivity {
 //        intent.putExtra("tag","-1");//-1直接调用停止
 //        startService(intent);
 
-        Intent intent = new Intent();
-        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv", "com.yongyida.yydrobotcv.service.FaceDetectService");
-        intent.setComponent(componentName);
-        intent.putExtra("startType", "stopTest");
-        startService(intent);
+//        Intent intent = new Intent();
+//        ComponentName componentName = new ComponentName("com.yongyida.yydrobotcv", "com.yongyida.yydrobotcv.service.FaceDetectService");
+//        intent.setComponent(componentName);
+//        intent.putExtra("startType", "stopTest");
+//        startService(intent);
+
+
+    }
+
+    public void startCCTV(View view) {
+//        FindDangersService.startActionFoo(this);
+//        Intent intent = new Intent(this, FindDangersActivity.class);
+//        startActivity(intent);
 
     }
 
@@ -239,13 +249,13 @@ public class PersonListActivity extends AppCompatActivity {
     }
 
     //获取权限
-    public void callpremission() {
+    public  void callpremission() {
         //系统版本号23/6.0之后/api23
         if (Build.VERSION.SDK_INT >= 23) {
             //检查有没有所需的权限 PackageManager.PERMISSION_GRANTED：授权了权限
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 //请求获取所需的权限，第二个参数：需要的权限（可以多个集合）第三个参数：请求码
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE}, REQUIRE_CODE_CALL_CAMERA);
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE ,Manifest.permission.INTERNET}, REQUIRE_CODE_CALL_CAMERA);
                 return;
             }
         }

@@ -43,17 +43,17 @@ public class BaseApplication extends Application {
 //        YMUtil.
         TTSManager.bindService(this);
         Log.e(TAG,"application onCreate");
-        if (LeakCanary.isInAnalyzerProcess(this)) {
-            // This process is dedicated to LeakCanary for heap analysis.
-            // You should not init your app in this process.
-            return;
-        }
+//        if (LeakCanary.isInAnalyzerProcess(this)) {
+//            // This process is dedicated to LeakCanary for heap analysis.
+//            // You should not init your app in this process.
+//            return;
+//        }
         File file = new File(DATA_PATH);
         if (!file.exists()){
             file.mkdirs();
             Log.e(TAG,"创建文件路径成功");
         }
-        LeakCanary.install(this);
+//        LeakCanary.install(this);
     }
 
     public static BaseApplication getAppContext() {

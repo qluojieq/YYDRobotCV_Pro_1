@@ -108,4 +108,22 @@ public class CommonUtils {
             }
         });
     }
+    public static void serviceToastT(final Context mContext, final String str) {
+        handler.post(new Runnable() {
+            public void run() {
+                if (toast == null) {
+                    toast = Toast.makeText(mContext, str, Toast.LENGTH_SHORT);
+                    //设置Toast显示位置，居中，向 X、Y轴偏移量均为0
+                    toast.setGravity(Gravity.CENTER, 0, 0);
+                    //设置显示时长
+                    toast.setText(str);
+                    //显示
+                } else {
+                    toast.setText(str);
+                }
+                toast.show();
+
+            }
+        });
+    }
 }
